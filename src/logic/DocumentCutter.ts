@@ -1,30 +1,50 @@
-import { PDFDocument, PDFName } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFPage } from 'pdf-lib';
 
 const processTitle = (title: any) => {
     return title.split("/").pop().replace("%20", " ");
 }
 
+// Convert File to the arrayBuffer
+const convertFile = async (file: File) => {
+    
+} 
+
 class DocumentCutter {
-    constructor(fileName) {
-        this.filePath = fileName;
+
+    file: File;
+    pdfDoc: any;
+    foundPages: any;
+    
+    
+    constructor(file: File) {
+        this.file = file;
         this.pdfDoc = null;
         this.foundPages = {};
     }
 
+    /*
+    constructor(fileName: string) {
+        this.filePath = fileName;
+        this.pdfDoc = null;
+        this.foundPages = {};
+    }
+    */
+
+    // TODO: use this later in more generic constructor
     async initialize() {
-        if(!/file:\/\//i.test(this.filePath)) {
+        if(!/file:\/\//i.test(this.file.name)) {
             // const arrayBuffer = await fetch(this.filePath).then(res => res.arrayBuffer());
             // this.pdfDoc = await PDFDocument.load(arrayBuffer);
-            this.pdfDoc = await PDFDocument.load(this.filePath);
+            this.pdfDoc = await PDFDocument.load(this.file.name);
             return this;
         }
-        const arrayBuffer = await fetch(this.filePath).then(res => res.arrayBuffer());
+        const arrayBuffer = await fetch(this.file.name).then(res => res.arrayBuffer());
         const uint8 = new Uint8Array(arrayBuffer);
         this.pdfDoc = await PDFDocument.load(uint8);
         return this;
     }
 
-    static satisifiesRules(references)  { 
+    static satisifiesRules(references: any)  { 
         // TODO: set types: -> Map<PDFRef, boolean>
 
         // gets Map object of references 
@@ -36,9 +56,11 @@ class DocumentCutter {
     findPages() {
         if(!this.pdfDoc) return this;
         const documentReferenceObjects = this.pdfDoc.context?.indirectObjects;
-        this.pdfDoc.getPages().forEach((page, pageIndex) => {
-            if(!page.node.Annots()?.array) return;
-            for(let annotation of page.node.Annots()?.array) {
+        this.pdfDoc.getPages().forEach((page: PDFPage, pageIndex: any) => {
+            const annotationArray = page.node.Annots()?.asArray(); 
+
+            if(!annotationArray) return;
+            for(let annotation of annotationArray) {
                 if(DocumentCutter.satisifiesRules(documentReferenceObjects.get(annotation))) {
                     this.foundPages[pageIndex] = true;
                     break;
@@ -60,14 +82,14 @@ class DocumentCutter {
 
 class NewDocumentCreator extends DocumentCutter {
     
-    async createNewPDF(fileName=`New_${processTitle(this.filePath)}`) {
+    async createNewPDF(fileName=`New_${processTitle(this.file.name)}`) {
         if(!this.pdfDoc.getPageCount()) return false;
         const pdfBytes = await this.pdfDoc.save();
-        NewDocumentCreator.download(pdfBytes, "application/pdf", fileName);
+        NewDocumentCreator.downloadFile(pdfBytes, "application/pdf", fileName);
         return true;
     }
 
-    static downloadFile = (content, mimeType, filename) => {
+    static downloadFile = (content: any, mimeType: string, filename: string) => {
         const a = document.createElement('a')
         const blob = new Blob([content], {type: mimeType})
         const url = URL.createObjectURL(blob)
@@ -76,7 +98,7 @@ class NewDocumentCreator extends DocumentCutter {
         a.click()
     };
   
-    static uploadFile(filePath, callback) {
+    static uploadFile(filePath: string, callback: any) {
         const httpRequest = new XMLHttpRequest();
         httpRequest.open("GET", filePath);
         httpRequest.send();
