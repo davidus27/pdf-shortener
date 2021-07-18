@@ -17,6 +17,7 @@ ta{
 }
 
 #cta {
+    cursor: pointer;
     -webkit-transform: scaleX(-1);
     transform: scaleX(-1);
 }
