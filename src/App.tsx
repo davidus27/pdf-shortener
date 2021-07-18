@@ -1,24 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  MemoryRouter as Router,
+  Switch,
+  Route
+} from "react-router-dom";
+
+import Home from './components/Home';
+import Checkout from './components/Checkout';
+import Loading from './components/Loading';
+import './styles/App.css';
+
+// import Footer from './components/Footer';
 
 function App() {
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="">
+      <Router>
+        <Switch>
+            <Route exact path="/Checkout" component={Checkout} />
+            <Route exact path="/Loading" component={Loading} />
+            { /* <Route path="/" component={NoDocumentFound} /> */ }
+            <Route path="/" component={Home} />
+        </Switch>
+      </Router>
+      {/* <Footer /> */ }       
     </div>
   );
 }
