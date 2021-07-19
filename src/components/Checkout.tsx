@@ -1,21 +1,30 @@
 import { Component } from 'react';
 
 import { NewDocumentCreator } from '../logic/DocumentCutter';
-
-
 import SelectButton from './SelectButton';
 import '../styles/BackButton.css';
 import BackButton from './BackButton';
+import { Button } from '@material-ui/core';
+import Loading from './Loading';
 
 interface CheckoutProps {
   activeDocuments: File[];
   history: any;
 }
 
-interface CheckoutState {}
+interface CheckoutState {
+  loadingShown: boolean;
+}
 
 
 class Checkout extends Component<CheckoutProps, CheckoutState> {
+
+  constructor(props: CheckoutProps) {
+    super(props);
+    this.state = {
+      loadingShown: false
+    };
+  }
 
   handleSubmit() {
     if (!this.props.activeDocuments.length) return;
@@ -32,6 +41,7 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
 
   render() {
     const { history } = this.props;
+
     return (
       <div id="pdf-found-div">
         <BackButton onClick={() => history.goBack()} />
@@ -45,6 +55,8 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
           Test.
         </div>
       
+        <Button onClick={() => {this.setState({loadingShown: true})}} >Select</Button>
+        <Loading loadingShown={this.state.loadingShown} />
         <SelectButton to="/Loading" onClick={this.handleSubmit.bind(this)} />
 
       </div>
