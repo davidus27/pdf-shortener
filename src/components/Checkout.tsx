@@ -14,6 +14,7 @@ interface CheckoutProps {
 
 interface CheckoutState {
   loadingShown: boolean;
+  open: boolean;
 }
 
 
@@ -22,7 +23,8 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
   constructor(props: CheckoutProps) {
     super(props);
     this.state = {
-      loadingShown: false
+      loadingShown: false,
+      open: false,
     };
   }
 
@@ -39,26 +41,33 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
     reader.readAsArrayBuffer(this.props.activeDocuments[0]);
   }
 
+
+  startLoading() {
+    this.setState({
+      open: true
+    });
+  }
+
   render() {
     const { history } = this.props;
+    
 
     return (
       <div id="pdf-found-div">
         <BackButton onClick={() => history.goBack()} />
 
-        <div className="position-absolute top-0 start-50 translate-middle-x">
+        <div>
             <br />
-            <h1 className="text-center display-5">TEXT</h1>
+            <h1>TEXT</h1>
         </div>
 
-        <div className="position-absolute top-50 start-50 translate-middle-x">
+        <div>
           Test.
         </div>
-      
-        <Button onClick={() => {this.setState({loadingShown: true})}} >Select</Button>
-        <Loading loadingShown={this.state.loadingShown} />
-        <SelectButton to="/Loading" onClick={this.handleSubmit.bind(this)} />
 
+        <SelectButton to="/Checkout" onClick={this.startLoading.bind(this)} />
+
+        <Loading open={this.state.open} setOpen={(openValue: boolean) => this.setState({ open: openValue })} /> 
       </div>
     );
   }

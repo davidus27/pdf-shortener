@@ -1,44 +1,8 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import { Backdrop } from '@material-ui/core';
-
-const BorderLinearProgress = withStyles((theme) => ({
-  root: {
-    height: 10,
-    borderRadius: 5,
-  },
-  colorPrimary: {
-    backgroundColor: theme.palette.grey[theme.palette.type === 'light' ? 200 : 700],
-  },
-  bar: {
-    borderRadius: 5,
-    backgroundColor: '#1a90ff',
-  },
-}))(LinearProgress);
-
-// Inspired by the former Facebook spinners.
-const useStylesFacebook = makeStyles((theme) => ({
-  root: {
-    position: 'relative',
-  },
-  bottom: {
-    color: theme.palette.grey[theme.palette.type === 'light' ? 200 : 700],
-  },
-  top: {
-    color: '#1a90ff',
-    animationDuration: '550ms',
-    position: 'absolute',
-    left: 0,
-  },
-  circle: {
-    strokeLinecap: 'round',
-  },
-}));
-
+import CloseIcon from '@material-ui/icons/Close';
+import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
   backdrop: {
@@ -47,21 +11,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-interface LoadingProps {
-  loadingShown: boolean
-}
 
-interface LoadingState {
-}
+export default function SimpleBackdrop({ open, setOpen } : any) {
+  const classes = useStyles();
 
-export default class Loading extends React.Component<LoadingProps, LoadingState> {
-
-  redirect() {
-    // const classes = useStyles();
-    return (
-      <Backdrop open={ this.props.loadingShown } onClick={() => console.log('AAAAH')}>
+  return (
+    <div>
+      <Backdrop className={classes.backdrop} open={open}>
         <CircularProgress color="inherit" />
+        <CloseIcon style={{ cursor: 'pointer', paddingBottom: '40px', paddingLeft: '10px'}} onClick={() => setOpen(false)} ></CloseIcon>
+        <h1>
+          Loading...
+        </h1>
       </Backdrop>
-    );
-  }
+    </div>
+  );
 }

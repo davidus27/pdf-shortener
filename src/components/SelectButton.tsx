@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
 
+import '../styles/SelectButton.css';
+
 interface ButtonProps {
   to: object | string;
   onClick: () => void;

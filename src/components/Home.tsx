@@ -44,6 +44,7 @@ class Home extends Component<HomeProps, HomeState> {
         <DropzoneArea
           acceptedFiles={['.pdf']}
           showPreviewsInDropzone={true}
+          maxFileSize={15728640}
           filesLimit={1}
           useChipsForPreview
           onChange={(files) => this.onChange(files)}
