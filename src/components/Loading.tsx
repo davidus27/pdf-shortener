@@ -12,14 +12,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function SimpleBackdrop({ open, setOpen } : any) {
+export default function SimpleBackdrop({ open, onCancel } : any) {
   const classes = useStyles();
 
   return (
     <div>
       <Backdrop className={classes.backdrop} open={open}>
         <CircularProgress color="inherit" />
-        <CloseIcon style={{ cursor: 'pointer', paddingBottom: '40px', paddingLeft: '10px'}} onClick={() => setOpen(false)} ></CloseIcon>
+        <CloseIcon style={{ cursor: 'pointer', paddingBottom: '40px', paddingLeft: '10px'}} onClick={onCancel} ></CloseIcon>
         <h1>
           Loading...
         </h1>

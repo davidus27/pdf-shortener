@@ -14,7 +14,6 @@ interface CheckoutProps {
 
 interface CheckoutState {
   loadingShown: boolean;
-  open: boolean;
 }
 
 
@@ -24,7 +23,6 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
     super(props);
     this.state = {
       loadingShown: false,
-      open: false,
     };
   }
 
@@ -32,7 +30,7 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
     if (!this.props.activeDocuments.length) return;
 
     const document = new NewDocumentCreator(this.props.activeDocuments[0]); // TODO: make it for all files
-    console.log(document);
+    // console.log(document);
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -42,9 +40,9 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
   }
 
 
-  startLoading() {
+  toggleLoading() {
     this.setState({
-      open: true
+      loadingShown: !this.state.loadingShown
     });
   }
 
@@ -65,9 +63,9 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
           Test.
         </div>
 
-        <SelectButton to="/Checkout" onClick={this.startLoading.bind(this)} />
+        <SelectButton to="/Checkout" onClick={this.toggleLoading.bind(this)} />
 
-        <Loading open={this.state.open} setOpen={(openValue: boolean) => this.setState({ open: openValue })} /> 
+        <Loading open={this.state.loadingShown} onCancel={this.toggleLoading.bind(this)} /> 
       </div>
     );
   }
