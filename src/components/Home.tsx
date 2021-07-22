@@ -4,7 +4,9 @@ import { DropzoneArea } from 'material-ui-dropzone';
 import SelectButton from './SelectButton';
 
 
-interface HomeProps {}
+interface HomeProps {
+  history: any
+}
 
 interface HomeState {
   activeDocuments: File[];
@@ -32,6 +34,13 @@ class Home extends Component<HomeProps, HomeState> {
     this.setState({activeDocuments: files});
   }
 
+  handleSubmit() : void {
+    this.props.history.push({
+      pathname: '/Checkout',
+      state: { activeDocuments: this.state.activeDocuments }
+    });
+  }
+
   render(): ReactElement {
     return (
       <div id="pdf-found-div">
@@ -52,10 +61,7 @@ class Home extends Component<HomeProps, HomeState> {
 
         {
           Boolean(this.state.activeDocuments.length) &&
-          <SelectButton 
-            to={{pathname: "/Checkout", query: { activeDocuments: this.state.activeDocuments }}} 
-            onClick={() => console.log(this.state.activeDocuments)}
-          />
+          <SelectButton onClick={this.handleSubmit.bind(this)} />
         }
       </div>
     );

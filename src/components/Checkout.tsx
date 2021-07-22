@@ -54,16 +54,9 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
       <div id="pdf-found-div">
         <BackButton onClick={() => history.goBack()} />
 
-        <div>
-            <br />
-            <h1>TEXT</h1>
-        </div>
 
-        <div>
-          Test.
-        </div>
 
-        <SelectButton to="/Checkout" onClick={this.toggleLoading.bind(this)} />
+        <SelectButton onClick={this.toggleLoading.bind(this)} />
 
         <Loading open={this.state.loadingShown} onCancel={this.toggleLoading.bind(this)} /> 
       </div>
