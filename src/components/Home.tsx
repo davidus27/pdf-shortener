@@ -43,27 +43,25 @@ class Home extends Component<HomeProps, HomeState> {
 
   render(): ReactElement {
     return (
-      <div id="pdf-found-div">
+      <div id="pdf-found-div" className="App">
+        <div className="App-header">
+          <br />
+          <h1 className="">Insert a new PDF document</h1>
 
-        <div className="">
-            <br />
-            <h1 className="">Insert a new PDF document</h1>
+          <DropzoneArea
+            acceptedFiles={['.pdf']}
+            showPreviewsInDropzone={true}
+            maxFileSize={15728640}
+            filesLimit={1}
+            useChipsForPreview
+            onChange={(files) => this.onChange(files)}
+            />
         </div>
-        
-        <DropzoneArea
-          acceptedFiles={['.pdf']}
-          showPreviewsInDropzone={true}
-          maxFileSize={15728640}
-          filesLimit={1}
-          useChipsForPreview
-          onChange={(files) => this.onChange(files)}
-        />
-
         {
-          Boolean(this.state.activeDocuments.length) &&
-          <SelectButton onClick={this.handleSubmit.bind(this)} />
+        Boolean(this.state.activeDocuments.length) &&
+        <SelectButton onClick={this.handleSubmit.bind(this)} />
         }
-      </div>
+    </div>
     );
   }
 }

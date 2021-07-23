@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, ReactElement } from 'react';
 
 import { NewDocumentCreator } from '../logic/DocumentCutter';
 import SelectButton from './SelectButton';
@@ -46,19 +46,16 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
     });
   }
 
-  render() {
+  render(): ReactElement {
     const { history } = this.props;
-    
 
     return (
-      <div id="pdf-found-div">
+      <div id="pdf-found-div" className="App">
         <BackButton onClick={() => history.goBack()} />
-
-
-
-        <SelectButton onClick={this.toggleLoading.bind(this)} />
-
-        <Loading open={this.state.loadingShown} onCancel={this.toggleLoading.bind(this)} /> 
+        <div className="App-header">
+          <SelectButton onClick={this.toggleLoading.bind(this)} />
+          <Loading open={this.state.loadingShown} onCancel={this.toggleLoading.bind(this)} /> 
+        </div>
       </div>
     );
   }
