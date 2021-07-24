@@ -7,8 +7,12 @@ import BackButton from '../components/BackButton';
 import Loading from '../components/Loading';
 
 interface CheckoutProps {
-  activeDocuments: File[];
   history: any;
+  location: {
+    state: {
+      activeDocuments: File[];
+    }
+  }
 }
 
 interface CheckoutState {
@@ -25,17 +29,33 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
     };
   }
 
-  handleSubmit() {
-    if (!this.props.activeDocuments.length) return;
+  async handleSubmit() {
+    this.toggleLoading();
+    await this.loadDocument();
+    this.toggleLoading();
+  }
+  
 
-    const document = new NewDocumentCreator(this.props.activeDocuments[0]); // TODO: make it for all files
-    // console.log(document);
+  async loadDocument() {
+    const documents = this.props.location.state.activeDocuments;
+    if (!documents.length) return;
+    
+    const firstDocument = new NewDocumentCreator(documents[0]); // TODO: make it for all files
+    await firstDocument.initialize();
 
+    const returnValue = firstDocument.findPages().removeExtraPages().createNewPDF();
+    if (!returnValue) {
+      console.log('No pages met the corresponding filters');
+    } else {
+      console.log('Filter ended!');
+    }
+    /*
     const reader = new FileReader();
     reader.onload = () => {
       NewDocumentCreator.downloadFile(reader.result, 'pdf/application', 'out.pdf');
     }
-    reader.readAsArrayBuffer(this.props.activeDocuments[0]);
+    reader.readAsArrayBuffer(this.props.location.state.activeDocuments[0]);
+    */
   }
 
 
@@ -52,7 +72,7 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
       <div id="pdf-found-div" className="App">
         <BackButton onClick={() => history.goBack()} />
         <div className="App-header">
-          <SelectButton onClick={this.toggleLoading.bind(this)} />
+          <SelectButton onClick={this.handleSubmit.bind(this)} />
           <Loading open={this.state.loadingShown} onCancel={this.toggleLoading.bind(this)} /> 
         </div>
       </div>
