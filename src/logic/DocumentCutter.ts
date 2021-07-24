@@ -4,11 +4,6 @@ const processTitle = (title: any) => {
     return title.split("/").pop().replace("%20", " ");
 }
 
-// Convert File to the arrayBuffer
-const convertFile = async (file: File) => {
-    
-} 
-
 class DocumentCutter {
 
     file: File;
@@ -30,8 +25,44 @@ class DocumentCutter {
     }
     */
 
-    // TODO: use this later in more generic constructor
+    private readFile(): Promise<ArrayBuffer | string> {
+        if (this.pdfDoc) throw TypeError;
+        return new Promise((resolve, reject): void =>  {
+            const reader = new FileReader();
+            reader.onload = res => {
+                if (reader.result) {
+                    resolve(reader.result);
+                }
+            };
+            reader.onerror = err => reject(err);
+
+            reader.readAsArrayBuffer(this.file);
+        });
+    }
+
+    private str2ab(str: any) {
+        var buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
+        var bufView = new Uint16Array(buf);
+        for (var i = 0, strLen = str.length; i < strLen; i++) {
+          bufView[i] = str.charCodeAt(i);
+        }
+        return buf;
+      }
+      
+   
+
+   // TODO: use this later in more generic constructor
     async initialize() {
+        const doc = await this.readFile();
+        // if (typeof doc === 'string') {
+        //     const docArrayBuffer = this.str2ab(doc);
+        //     this.pdfDoc = await PDFDocument.load(docArrayBuffer); 
+        // }
+        // else {
+        // }
+        this.pdfDoc = await PDFDocument.load(doc); 
+        
+        /*
         if(!/file:\/\//i.test(this.file.name)) {
             // const arrayBuffer = await fetch(this.filePath).then(res => res.arrayBuffer());
             // this.pdfDoc = await PDFDocument.load(arrayBuffer);
@@ -42,6 +73,7 @@ class DocumentCutter {
         const uint8 = new Uint8Array(arrayBuffer);
         this.pdfDoc = await PDFDocument.load(uint8);
         return this;
+        */
     }
 
     static satisifiesRules(references: any)  { 
@@ -85,7 +117,7 @@ class NewDocumentCreator extends DocumentCutter {
     async createNewPDF(fileName=`New_${processTitle(this.file.name)}`) {
         if(!this.pdfDoc.getPageCount()) return false;
         const pdfBytes = await this.pdfDoc.save();
-        NewDocumentCreator.downloadFile(pdfBytes, "application/pdf", fileName);
+        NewDocumentCreator.downloadFile(pdfBytes, "pdf/application", fileName);
         return true;
     }
 
