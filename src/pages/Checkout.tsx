@@ -1,11 +1,10 @@
 import { Component, ReactElement } from 'react';
 
 import { NewDocumentCreator } from '../logic/DocumentCutter';
-import SelectButton from './SelectButton';
+import SelectButton from '../components/SelectButton';
 import '../styles/BackButton.css';
-import BackButton from './BackButton';
-import { Button } from '@material-ui/core';
-import Loading from './Loading';
+import BackButton from '../components/BackButton';
+import Loading from '../components/Loading';
 
 interface CheckoutProps {
   activeDocuments: File[];

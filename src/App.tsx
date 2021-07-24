@@ -4,8 +4,8 @@ import {
   Route
 } from "react-router-dom";
 
-import Home from './components/Home';
-import Checkout from './components/Checkout';
+import Home from './pages/Home';
+import Checkout from './pages/Checkout';
 import Loading from './components/Loading';
 import './styles/App.css';
 

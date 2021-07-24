@@ -1,7 +1,7 @@
 import { Component, ReactElement } from 'react';
 import { DropzoneArea } from 'material-ui-dropzone';
 
-import SelectButton from './SelectButton';
+import SelectButton from '../components/SelectButton';
 
 
 interface HomeProps {
