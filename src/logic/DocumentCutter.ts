@@ -1,32 +1,45 @@
 import { PDFDocument, PDFName, PDFPage } from 'pdf-lib';
 
+
+/**
+ * Helpfull functions for the processing of PDF file
+ */
+
 const processTitle = (title: any) => {
     return title.split("/").pop().replace("%20", " ");
 }
 
-class DocumentCutter {
+const downloadFile = (content: any, mimeType: string, filename: string) => {
+    const a = document.createElement('a')
+    const blob = new Blob([content], {type: mimeType})
+    const url = URL.createObjectURL(blob)
+    a.setAttribute('href', url)
+    a.setAttribute('download', filename)
+    a.click()
+};
 
-    file: File;
-    pdfDoc: any;
-    foundPages: any;
-    
-    
-    constructor(file: File) {
-        this.file = file;
-        this.pdfDoc = null;
-        this.foundPages = {};
+const uploadFile = (filePath: string, callback: any) => {
+    const httpRequest = new XMLHttpRequest();
+    httpRequest.open("GET", filePath);
+    httpRequest.send();
+    httpRequest.onload = callback;
+};
+
+
+
+/**
+ * Responsible to convert any convertable form of PDF file 
+ * (File | ArrayBuffer | string ...) into PDFDocument object
+ */
+class DocumentProcessor {
+ 
+    private file: File;
+
+    constructor(input : File) {
+        this.file = input;
     }
 
-    /*
-    constructor(fileName: string) {
-        this.filePath = fileName;
-        this.pdfDoc = null;
-        this.foundPages = {};
-    }
-    */
-
-    private readFile(): Promise<ArrayBuffer | string> {
-        if (this.pdfDoc) throw TypeError;
+    protected async prepareFile(): Promise<ArrayBuffer | string> {
         return new Promise((resolve, reject): void =>  {
             const reader = new FileReader();
             reader.onload = res => {
@@ -39,44 +52,33 @@ class DocumentCutter {
             reader.readAsArrayBuffer(this.file);
         });
     }
+    
+    public async load(): Promise<PDFDocument> {
+        const finalDocument = await this.prepareFile();
+        return await PDFDocument.load(finalDocument);
+    }
+}
 
-    private str2ab(str: any) {
-        var buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
-        var bufView = new Uint16Array(buf);
-        for (var i = 0, strLen = str.length; i < strLen; i++) {
-          bufView[i] = str.charCodeAt(i);
-        }
-        return buf;
-      }
-      
-   
+/**
+ * Containing the elementary operations under the PDF file
+ */
+class DocumentCutter {
 
-   // TODO: use this later in more generic constructor
-    async initialize() {
-        const doc = await this.readFile();
-        // if (typeof doc === 'string') {
-        //     const docArrayBuffer = this.str2ab(doc);
-        //     this.pdfDoc = await PDFDocument.load(docArrayBuffer); 
-        // }
-        // else {
-        // }
-        this.pdfDoc = await PDFDocument.load(doc); 
-        
-        /*
-        if(!/file:\/\//i.test(this.file.name)) {
-            // const arrayBuffer = await fetch(this.filePath).then(res => res.arrayBuffer());
-            // this.pdfDoc = await PDFDocument.load(arrayBuffer);
-            this.pdfDoc = await PDFDocument.load(this.file.name);
-            return this;
-        }
-        const arrayBuffer = await fetch(this.file.name).then(res => res.arrayBuffer());
-        const uint8 = new Uint8Array(arrayBuffer);
-        this.pdfDoc = await PDFDocument.load(uint8);
-        return this;
-        */
+    protected pdfDoc: any;
+    protected file: File;
+    protected foundPages: any;
+    
+    constructor(file: File) {
+        this.file = file;
+        this.foundPages = {};
     }
 
-    static satisifiesRules(references: any)  { 
+    protected async initialize() {
+        this.pdfDoc = await new DocumentProcessor(this.file).load();   
+    }
+
+
+    protected satisifiesRules(references: any)  { 
         // TODO: set types: -> Map<PDFRef, boolean>
 
         // gets Map object of references 
@@ -85,15 +87,16 @@ class DocumentCutter {
         return references.get(PDFName.of("Subtype")) === PDFName.of("Highlight");
     }
 
-    findPages() {
+    protected findPages(filter: any) {
         if(!this.pdfDoc) return this;
+        
         const documentReferenceObjects = this.pdfDoc.context?.indirectObjects;
         this.pdfDoc.getPages().forEach((page: PDFPage, pageIndex: any) => {
             const annotationArray = page.node.Annots()?.asArray(); 
 
             if(!annotationArray) return;
             for(let annotation of annotationArray) {
-                if(DocumentCutter.satisifiesRules(documentReferenceObjects.get(annotation))) {
+                if(this.satisifiesRules(documentReferenceObjects.get(annotation))) {
                     this.foundPages[pageIndex] = true;
                     break;
                 }
@@ -102,7 +105,9 @@ class DocumentCutter {
         return this;
     }
     
-    removeExtraPages() {
+    protected removeExtraPages() {
+        if (!this.pdfDoc) return this;
+
         for(let pageIndex = this.pdfDoc.getPageCount() - 1; pageIndex >= 0; pageIndex--) {
             if(!this.foundPages[pageIndex]) {
                 this.pdfDoc.removePage(pageIndex);
@@ -112,32 +117,39 @@ class DocumentCutter {
     }
 }
 
+interface PDFFilter {
+    type: string
+};
+
+/**
+ * Responsible to filter and create new document that can be downloaded
+ */
 class NewDocumentCreator extends DocumentCutter {
-    
-    async createNewPDF(fileName=`New_${processTitle(this.file.name)}`) {
-        if(!this.pdfDoc.getPageCount()) return false;
+
+    async createFilteredDocument(filter: PDFFilter, fileName=`New_${processTitle(this.file.name)}`): Promise<number> {
+        // Initiate the PDF document object
+        await this.initialize();
+
+        // Check if the object was successfully created
+        if(!this.pdfDoc) throw Error;
+
+
+        // Find pages using corresponding filter and remove them from the PDF document object
+        // TODO: create copy of the object and remove pages from it instead
+        this.findPages(filter).removeExtraPages();
+
+        // If all pages were removed return 0
+        if(!this.pdfDoc.getPageCount()) return 0;
+        
+
+        // Save the document and download a file
         const pdfBytes = await this.pdfDoc.save();
-        NewDocumentCreator.downloadFile(pdfBytes, "pdf/application", fileName);
-        return true;
+        downloadFile(pdfBytes, "pdf/application", fileName);
+
+        return this.pdfDoc.getPageCount();
     }
 
-    static downloadFile = (content: any, mimeType: string, filename: string) => {
-        const a = document.createElement('a')
-        const blob = new Blob([content], {type: mimeType})
-        const url = URL.createObjectURL(blob)
-        a.setAttribute('href', url)
-        a.setAttribute('download', filename)
-        a.click()
-    };
-  
-    static uploadFile(filePath: string, callback: any) {
-        const httpRequest = new XMLHttpRequest();
-        httpRequest.open("GET", filePath);
-        httpRequest.send();
-        httpRequest.onload = callback;
-    }
   
 }
-
 
 export {processTitle, NewDocumentCreator};

@@ -40,10 +40,9 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
     const documents = this.props.location.state.activeDocuments;
     if (!documents.length) return;
     
-    const firstDocument = new NewDocumentCreator(documents[0]); // TODO: make it for all files
-    await firstDocument.initialize();
+    const firstDocument = new NewDocumentCreator(documents[0]);
 
-    const returnValue = firstDocument.findPages().removeExtraPages().createNewPDF();
+    const returnValue = firstDocument.createFilteredDocument({ type: 'bold' });
     if (!returnValue) {
       console.log('No pages met the corresponding filters');
     } else {
