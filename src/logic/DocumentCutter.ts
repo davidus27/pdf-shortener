@@ -1,4 +1,4 @@
-import { PDFDocument, PDFName, PDFPage } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFObject, PDFPage, PDFDict } from 'pdf-lib';
 
 
 /**
@@ -39,10 +39,10 @@ class DocumentProcessor {
         this.file = input;
     }
 
-    protected async prepareFile(): Promise<ArrayBuffer | string> {
+    private async prepareFile(): Promise<ArrayBuffer | string> {
         return new Promise((resolve, reject): void =>  {
             const reader = new FileReader();
-            reader.onload = res => {
+            reader.onload = () => {
                 if (reader.result) {
                     resolve(reader.result);
                 }
@@ -59,26 +59,10 @@ class DocumentProcessor {
     }
 }
 
-/**
- * Containing the elementary operations under the PDF file
- */
-class DocumentCutter {
 
-    protected pdfDoc: any;
-    protected file: File;
-    protected foundPages: any;
-    
-    constructor(file: File) {
-        this.file = file;
-        this.foundPages = {};
-    }
+class DocumentFiltering {
 
-    protected async initialize() {
-        this.pdfDoc = await new DocumentProcessor(this.file).load();   
-    }
-
-
-    protected satisifiesRules(references: any)  { 
+    protected satisifiesRules(references: Map<PDFName, PDFObject>) {
         // TODO: set types: -> Map<PDFRef, boolean>
 
         // gets Map object of references 
@@ -86,17 +70,46 @@ class DocumentCutter {
         // page does contain highlighted elements
         return references.get(PDFName.of("Subtype")) === PDFName.of("Highlight");
     }
+}
+
+
+/**
+ * Containing the elementary operations under the PDF file
+ */
+class DocumentCutter extends DocumentFiltering {
+
+    private pdfDoc: any;
+    private file: File;
+    private foundPages: { [key: string]: boolean };
+    
+    constructor(file: File) {
+        super();
+        this.file = file;
+        this.foundPages = {};
+    }
+
+    protected async initialize() {
+        this.pdfDoc = await new DocumentProcessor(this.file).load();   
+    }
+    
+    protected get document() {
+        return this.pdfDoc;
+    }
+
+    protected get documentName() {
+        return this.file.name;
+    }
 
     protected findPages(filter: any) {
         if(!this.pdfDoc) return this;
-        
-        const documentReferenceObjects = this.pdfDoc.context?.indirectObjects;
-        this.pdfDoc.getPages().forEach((page: PDFPage, pageIndex: any) => {
-            const annotationArray = page.node.Annots()?.asArray(); 
 
-            if(!annotationArray) return;
-            for(let annotation of annotationArray) {
-                if(this.satisifiesRules(documentReferenceObjects.get(annotation))) {
+        this.pdfDoc.getPages().forEach((page: PDFPage, pageIndex: number) => {
+            const annotations = page.node.Annots()?.asArray();
+
+            if (!annotations) return;
+            for(const reference of annotations) {
+                const referenceDict: PDFDict = this.pdfDoc.context.lookup(reference);
+                if(this.satisifiesRules(referenceDict.asMap())) {
                     this.foundPages[pageIndex] = true;
                     break;
                 }
@@ -138,7 +151,12 @@ class DocumentCutter {
 }
 
 interface PDFFilter {
-    type: string
+    type: string;
+}
+
+export interface PDFDocumentSettings {
+    options: any;
+    filter: PDFFilter;
 };
 
 /**
@@ -146,24 +164,26 @@ interface PDFFilter {
  */
 class NewDocumentCreator extends DocumentCutter {
 
-    async createFilteredDocument(filter: PDFFilter, fileName=`New_${processTitle(this.file.name)}`): Promise<number> {
+
+
+    public async createFilteredDocument(settings: PDFDocumentSettings, fileName=`New_${processTitle(this.documentName)}`): Promise<number> {
         // Initiate the PDF document object
         await this.initialize();
 
         // Check if the object was successfully created
-        if(!this.pdfDoc) throw Error;
+        if(!this.document) throw Error;
 
 
         // Find pages using corresponding filter and remove them from the PDF document object
         // TODO: create copy of the object and remove pages from it instead
-        this.findPages(filter).removeExtraPages();
+        this.findPages(settings.filter.type).removeExtraPages();
 
         // If all pages were removed return 0
-        if(!this.pdfDoc.getPageCount()) return 0;
+        if(!this.document.getPageCount()) return 0;
         
 
         // Save the document and download a file
-        const pdfBytes = await this.pdfDoc.save();
+        const pdfBytes = await this.document.save();
         downloadFile(pdfBytes, "pdf/application", fileName);
 
         // Save new document and download a file
@@ -172,8 +192,7 @@ class NewDocumentCreator extends DocumentCutter {
         downloadFile(newPDFBytes, "pdf/application", 'new_copy.pdf');
 
 
-
-        return this.pdfDoc.getPageCount();
+        return this.document.getPageCount();
     }
 
   
