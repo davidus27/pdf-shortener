@@ -2,9 +2,11 @@ import { Component, ReactElement } from 'react';
 
 import { NewDocumentCreator } from '../logic/DocumentCutter';
 import SelectButton from '../components/SelectButton';
-import '../styles/BackButton.css';
 import BackButton from '../components/BackButton';
+import Radio from '@material-ui/core/Radio';
 import Loading from '../components/Loading';
+import '../styles/BackButton.css';
+
 
 interface CheckoutProps {
   history: any;
@@ -48,13 +50,6 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
     } else {
       console.log('Filter ended!');
     }
-    /*
-    const reader = new FileReader();
-    reader.onload = () => {
-      NewDocumentCreator.downloadFile(reader.result, 'pdf/application', 'out.pdf');
-    }
-    reader.readAsArrayBuffer(this.props.location.state.activeDocuments[0]);
-    */
   }
 
 
