@@ -1,6 +1,6 @@
 import { Component, ReactElement } from 'react';
 
-import { NewDocumentCreator } from '../logic/DocumentCutter';
+import { NewDocumentCreator, PDFDocumentSettings } from '../logic/DocumentCutter';
 import SelectButton from '../components/SelectButton';
 import BackButton from '../components/BackButton';
 import Radio from '@material-ui/core/Radio';
@@ -42,9 +42,16 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
     const documents = this.props.location.state.activeDocuments;
     if (!documents.length) return;
     
-    const firstDocument = new NewDocumentCreator(documents[0]);
+    
+    const settings: PDFDocumentSettings = {
+      filter: {
+        type: "bold"
+      },
+      options: undefined
+    }
+    
+    const returnValue = new NewDocumentCreator(documents[0]).createFilteredDocument(settings);
 
-    const returnValue = firstDocument.createFilteredDocument({ type: 'bold' });
     if (!returnValue) {
       console.log('No pages met the corresponding filters');
     } else {
