@@ -115,6 +115,26 @@ class DocumentCutter {
         }
         return this;
     }
+
+    /**
+     * Creates a new PDF document with copied filtered pages.
+     * Creates much smaller document, 
+     * but does not contain all the information from the original document 
+     * @returns newPDFDoc: PDFDocuemnt
+     */
+    protected async createNewPdf() {
+        const newPDFDoc = await PDFDocument.create();
+        
+        const indexes = Object.keys(this.foundPages).map(element => parseInt(element));
+
+        const copiedPages = await newPDFDoc.copyPages(this.pdfDoc, indexes);
+
+        copiedPages.forEach(page => {
+            newPDFDoc.addPage(page);
+        });
+
+        return newPDFDoc;
+    }
 }
 
 interface PDFFilter {
@@ -145,6 +165,13 @@ class NewDocumentCreator extends DocumentCutter {
         // Save the document and download a file
         const pdfBytes = await this.pdfDoc.save();
         downloadFile(pdfBytes, "pdf/application", fileName);
+
+        // Save new document and download a file
+        const newPDFDocument = await this.createNewPdf();
+        const newPDFBytes = await newPDFDocument.save();
+        downloadFile(newPDFBytes, "pdf/application", 'new_copy.pdf');
+
+
 
         return this.pdfDoc.getPageCount();
     }
