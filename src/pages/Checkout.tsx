@@ -45,7 +45,7 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
     
     const settings: PDFDocumentSettings = {
       filter: {
-        type: "bold"
+        type: "link"
       },
       options: undefined
     }
