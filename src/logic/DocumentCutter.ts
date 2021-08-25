@@ -59,16 +59,61 @@ class DocumentProcessor {
     }
 }
 
+type allowedValues = string[]; 
+
+
 
 class DocumentFiltering {
 
-    protected satisifiesRules(references: Map<PDFName, PDFObject>) {
-        // TODO: set types: -> Map<PDFRef, boolean>
+    protected rules: {[key: string] : (references: Map<PDFName, PDFObject>) => Boolean} = {
+        'image': this.hasImage,
+        'link': this.hasLinks,
+        'highlight': this.hasHighlight,
+    }
 
+    
+
+    private hasImage(references: Map<PDFName, PDFObject>) {
+        // if (this.references.get(PDFName.of("Subtype")) === PDFName.of("")) {
+
+        // }
+        return false;
+    }
+
+    private hasLinks(references: Map<PDFName, PDFObject>) {
+        
+        console.log('annot:', references.get(PDFName.of("Annot")));
+        console.log('annot:', PDFName.of("Annot"));
+        console.log('annots:', PDFName.Annots);
+        console.log('sub:', PDFName.of("Subtype"));
+        console.log('sub:', references.get(PDFName.of("Subtype")));
+        // console.log('ref:', PDFName.of("Subtype"));
+        // console.log('ref:', PDFName);
+
+
+
+        return !!(references.get(PDFName.of("Subtype")) === PDFName.of("Link") || references.get(PDFName.of("Annot")) === PDFName.of("Annot"));
+    }
+
+    private hasHighlight(references: Map<PDFName, PDFObject>) {
+        return !!(references.get(PDFName.of("Subtype")) === PDFName.of("Highlight"));
+    }
+
+    /**
+     * 
+     * @param references - references inside one indirect object of the PDF file
+     * @param rule - rule that are enforced on what is going to be excluded from the filter
+     * @returns Boolean
+     */
+    public satisifiesRules(references: Map<PDFName, PDFObject>, rule: string) {
         // gets Map object of references 
         // returns boolean value if that 
         // page does contain highlighted elements
-        return references.get(PDFName.of("Subtype")) === PDFName.of("Highlight");
+
+        console.log('REFERENCE:', references.get(PDFName.of("Subtype")));
+        console.log('ALL:', references.values());
+        
+        return this.rules[rule](references);
     }
 }
 
@@ -100,7 +145,7 @@ class DocumentCutter extends DocumentFiltering {
         return this.file.name;
     }
 
-    protected findPages(filter: any) {
+    protected findPages(filterType: string) {
         if(!this.pdfDoc) return this;
 
         this.pdfDoc.getPages().forEach((page: PDFPage, pageIndex: number) => {
@@ -109,7 +154,10 @@ class DocumentCutter extends DocumentFiltering {
             if (!annotations) return;
             for(const reference of annotations) {
                 const referenceDict: PDFDict = this.pdfDoc.context.lookup(reference);
-                if(this.satisifiesRules(referenceDict.asMap())) {
+                
+                console.log('Page:', pageIndex);
+
+                if(this.satisifiesRules(referenceDict.asMap(), filterType)) {
                     this.foundPages[pageIndex] = true;
                     break;
                 }
@@ -182,14 +230,14 @@ class NewDocumentCreator extends DocumentCutter {
         if(!this.document.getPageCount()) return 0;
         
 
-        // Save the document and download a file
-        const pdfBytes = await this.document.save();
-        downloadFile(pdfBytes, "pdf/application", fileName);
+        // // Save the document and download a file
+        // const pdfBytes = await this.document.save();
+        // downloadFile(pdfBytes, "pdf/application", fileName);
 
-        // Save new document and download a file
-        const newPDFDocument = await this.createNewPdf();
-        const newPDFBytes = await newPDFDocument.save();
-        downloadFile(newPDFBytes, "pdf/application", 'new_copy.pdf');
+        // // Save new document and download a file
+        // const newPDFDocument = await this.createNewPdf();
+        // const newPDFBytes = await newPDFDocument.save();
+        // downloadFile(newPDFBytes, "pdf/application", 'new_copy.pdf');
 
 
         return this.document.getPageCount();
