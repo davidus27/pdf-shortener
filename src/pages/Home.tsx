@@ -1,6 +1,5 @@
 import { Component, ReactElement } from 'react';
 import { DropzoneArea } from 'material-ui-dropzone';
-
 import SelectButton from '../components/SelectButton';
 
 
@@ -43,9 +42,8 @@ class Home extends Component<HomeProps, HomeState> {
 
   render(): ReactElement {
     return (
-      <div id="pdf-found-div" className="App">
-        <div className="App-header">
-          <br />
+      <div className="App">
+        <div>
           <h1 className="">Insert a new PDF document</h1>
 
           <DropzoneArea
