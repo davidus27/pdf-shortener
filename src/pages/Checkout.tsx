@@ -3,8 +3,8 @@ import { Component, ReactElement } from 'react';
 import { NewDocumentCreator, PDFDocumentSettings } from '../logic/DocumentCutter';
 import SelectButton from '../components/SelectButton';
 import BackButton from '../components/BackButton';
-import Radio from '@material-ui/core/Radio';
 import Loading from '../components/Loading';
+import DocumentForm from '../components/DocumentForm';
 import '../styles/BackButton.css';
 
 
@@ -19,16 +19,27 @@ interface CheckoutProps {
 
 interface CheckoutState {
   loadingShown: boolean;
+  settings: PDFDocumentSettings;
 }
 
 
 class Checkout extends Component<CheckoutProps, CheckoutState> {
 
+  protected documentCreator: NewDocumentCreator;
+
   constructor(props: CheckoutProps) {
     super(props);
     this.state = {
       loadingShown: false,
+      settings: {
+        filter: {
+          type: "link"
+        },
+        options: undefined
+      }
     };
+
+    this.documentCreator = new NewDocumentCreator(this.props.location.state.activeDocuments[0]);
   }
 
   async handleSubmit() {
@@ -39,18 +50,8 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
   
 
   async loadDocument() {
-    const documents = this.props.location.state.activeDocuments;
-    if (!documents.length) return;
-    
-    
-    const settings: PDFDocumentSettings = {
-      filter: {
-        type: "link"
-      },
-      options: undefined
-    }
-    
-    const returnValue = new NewDocumentCreator(documents[0]).createFilteredDocument(settings);
+
+    const returnValue = this.documentCreator.createFilteredDocument(this.state.settings);
 
     if (!returnValue) {
       console.log('No pages met the corresponding filters');
@@ -72,10 +73,9 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
     return (
       <div id="pdf-found-div" className="App">
         <BackButton onClick={() => history.goBack()} />
-        <div className="App-header">
-          <SelectButton onClick={this.handleSubmit.bind(this)} />
-          <Loading open={this.state.loadingShown} onCancel={this.toggleLoading.bind(this)} /> 
-        </div>
+        <DocumentForm />
+        <SelectButton onClick={this.handleSubmit.bind(this)} />
+        <Loading open={this.state.loadingShown} onCancel={this.toggleLoading.bind(this)} /> 
       </div>
     );
   }
