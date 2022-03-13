@@ -6,6 +6,7 @@ import {
 
 import Home from './pages/Home';
 import Checkout from './pages/Checkout';
+import Ending from "./pages/Ending";
 import './styles/App.css';
 
 // import Footer from './components/Footer';
@@ -17,6 +18,7 @@ function App() {
       <Router>
         <Switch>
             <Route exact path="/Checkout" component={Checkout} />
+            <Route exact path="/Final" component={Ending} />
             <Route path="/" component={Home} />
         </Switch>
       </Router>
