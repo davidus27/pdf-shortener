@@ -1,19 +1,24 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "PDF Shortener",
+  "name": "PDF Shortener",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
+      "src": "./assets/pdf-file16.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "16x16"
     },
     {
-      "src": "logo512.png",
+      "src": "./assets/pdf-file64.png",
+      "type": "image/png",
+      "sizes": "64x64"
+    },
+    {
+      "src": "./assets/pdf-file256.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    },
+    {
+      "src": "./assets/pdf-file512.png",
       "type": "image/png",
       "sizes": "512x512"
     }

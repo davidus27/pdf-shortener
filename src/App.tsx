@@ -4,9 +4,8 @@ import {
   Route
 } from "react-router-dom";
 
-import Home from './components/Home';
-import Checkout from './components/Checkout';
-import Loading from './components/Loading';
+import Home from './pages/Home';
+import Checkout from './pages/Checkout';
 import './styles/App.css';
 
 // import Footer from './components/Footer';
@@ -18,8 +17,6 @@ function App() {
       <Router>
         <Switch>
             <Route exact path="/Checkout" component={Checkout} />
-            <Route exact path="/Loading" component={Loading} />
-            { /* <Route path="/" component={NoDocumentFound} /> */ }
             <Route path="/" component={Home} />
         </Switch>
       </Router>

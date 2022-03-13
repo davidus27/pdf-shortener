@@ -1,10 +1,11 @@
 import { Component, ReactElement } from 'react';
 import { DropzoneArea } from 'material-ui-dropzone';
+import SelectButton from '../components/SelectButton';
 
-import SelectButton from './SelectButton';
 
-
-interface HomeProps {}
+interface HomeProps {
+  history: any
+}
 
 interface HomeState {
   activeDocuments: File[];
@@ -32,31 +33,33 @@ class Home extends Component<HomeProps, HomeState> {
     this.setState({activeDocuments: files});
   }
 
+  handleSubmit() : void {
+    this.props.history.push({
+      pathname: '/Checkout',
+      state: { activeDocuments: this.state.activeDocuments }
+    });
+  }
+
   render(): ReactElement {
     return (
-      <div id="pdf-found-div">
+      <div className="App">
+        <div>
+          <h1 className="">Insert a new PDF document</h1>
 
-        <div className="">
-            <br />
-            <h1 className="">Insert a new PDF document</h1>
+          <DropzoneArea
+            acceptedFiles={['.pdf']}
+            showPreviewsInDropzone={true}
+            maxFileSize={15728640}
+            filesLimit={1}
+            useChipsForPreview
+            onChange={(files) => this.onChange(files)}
+            />
         </div>
-        
-        <DropzoneArea
-          acceptedFiles={['.pdf']}
-          showPreviewsInDropzone={true}
-          filesLimit={1}
-          useChipsForPreview
-          onChange={(files) => this.onChange(files)}
-        />
-
         {
-          Boolean(this.state.activeDocuments.length) &&
-          <SelectButton 
-            to={{pathname: "/Checkout", query: { activeDocuments: this.state.activeDocuments }}} 
-            onClick={() => console.log(this.state.activeDocuments)}
-          />
+        Boolean(this.state.activeDocuments.length) &&
+        <SelectButton onClick={this.handleSubmit.bind(this)} />
         }
-      </div>
+    </div>
     );
   }
 }
