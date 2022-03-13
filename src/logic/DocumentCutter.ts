@@ -59,28 +59,26 @@ class DocumentProcessor {
     }
 }
 
-type allowedValues = string[]; 
-
-
-
 class DocumentFiltering {
 
-    protected rules: {[key: string] : (references: Map<PDFName, PDFObject>) => Boolean} = {
+    protected rules: { [key: string] : (references: Map<PDFName, PDFObject>) => Boolean } = {
         'image': this.hasImage,
         'link': this.hasLinks,
         'highlight': this.hasHighlight,
     }
 
-    
+    private hasImage(references: Map<PDFName, PDFObject>) : boolean {
 
-    private hasImage(references: Map<PDFName, PDFObject>) {
+        console.log(references.get(PDFName.of("Contents")));
+
+        return !!(references.get(PDFName.of("Contents")));
+
         // if (this.references.get(PDFName.of("Subtype")) === PDFName.of("")) {
 
         // }
-        return false;
     }
 
-    private hasLinks(references: Map<PDFName, PDFObject>) {
+    private hasLinks(references: Map<PDFName, PDFObject>) : boolean {
         
         console.log('annot:', references.get(PDFName.of("Annot")));
         console.log('annot:', PDFName.of("Annot"));
@@ -95,7 +93,7 @@ class DocumentFiltering {
         return !!(references.get(PDFName.of("Subtype")) === PDFName.of("Link") || references.get(PDFName.of("Annot")) === PDFName.of("Annot"));
     }
 
-    private hasHighlight(references: Map<PDFName, PDFObject>) {
+    private hasHighlight(references: Map<PDFName, PDFObject>) : boolean {
         return !!(references.get(PDFName.of("Subtype")) === PDFName.of("Highlight"));
     }
 
@@ -105,15 +103,14 @@ class DocumentFiltering {
      * @param rule - rule that are enforced on what is going to be excluded from the filter
      * @returns Boolean
      */
-    public satisifiesRules(references: Map<PDFName, PDFObject>, rule: string) {
+    public satisifiesRules(references: Map<PDFName, PDFObject>, rule: string) : boolean {
         // gets Map object of references 
-        // returns boolean value if that 
-        // page does contain highlighted elements
+        // returns boolean value if that page does contain specified type of reference
 
         console.log('REFERENCE:', references.get(PDFName.of("Subtype")));
         console.log('ALL:', references.values());
         
-        return this.rules[rule](references);
+        return !!(this.rules[rule](references));
     }
 }
 
@@ -152,8 +149,8 @@ class DocumentCutter extends DocumentFiltering {
             const annotations = page.node.Annots()?.asArray();
 
             if (!annotations) return;
-            for(const reference of annotations) {
-                const referenceDict: PDFDict = this.pdfDoc.context.lookup(reference);
+            for(const annotation of annotations) {
+                const referenceDict: PDFDict = this.pdfDoc.context.lookup(annotation);
                 
                 console.log('Page:', pageIndex);
 
@@ -235,9 +232,9 @@ class NewDocumentCreator extends DocumentCutter {
         // downloadFile(pdfBytes, "pdf/application", fileName);
 
         // // Save new document and download a file
-        // const newPDFDocument = await this.createNewPdf();
-        // const newPDFBytes = await newPDFDocument.save();
-        // downloadFile(newPDFBytes, "pdf/application", 'new_copy.pdf');
+        const newPDFDocument = await this.createNewPdf();
+        const newPDFBytes = await newPDFDocument.save();
+        downloadFile(newPDFBytes, "pdf/application", 'new_copy.pdf');
 
 
         return this.document.getPageCount();
