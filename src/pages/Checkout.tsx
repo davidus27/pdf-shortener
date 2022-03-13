@@ -42,21 +42,30 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
     this.documentCreator = new NewDocumentCreator(this.props.location.state.activeDocuments[0]);
   }
 
-  async handleSubmit() {
+  handleSubmit() {
     this.toggleLoading();
-    await this.loadDocument();
-    this.toggleLoading();
+    this.loadDocument().then(() => {
+      this.toggleLoading();
+      this.endingRoute();
+    });
   }
   
 
+  endingRoute() {
+    this.props.history.push({
+      pathname: '/Final',
+      state: {}
+    });
+  }
+
   async loadDocument() {
 
-    const returnValue = this.documentCreator.createFilteredDocument(this.state.settings);
+    const finalPageCount = await this.documentCreator.createFilteredDocument(this.state.settings);
 
-    if (!returnValue) {
+    if (!finalPageCount) {
       console.log('No pages met the corresponding filters');
     } else {
-      console.log('Filter ended!');
+      console.log('Filter ended!', finalPageCount);
     }
   }
 
@@ -68,14 +77,16 @@ class Checkout extends Component<CheckoutProps, CheckoutState> {
   }
 
   render(): ReactElement {
-    const { history } = this.props;
 
     return (
       <div id="pdf-found-div" className="App">
-        <BackButton onClick={() => history.goBack()} />
-        <DocumentForm />
-        <SelectButton onClick={this.handleSubmit.bind(this)} />
+        {/* <BackButton onClick={() => this.state.history.goBack()} /> */}
+        {/* <DocumentForm /> */}
+
         <Loading open={this.state.loadingShown} onCancel={this.toggleLoading.bind(this)} /> 
+
+
+        <SelectButton onClick={this.handleSubmit.bind(this)} />
       </div>
     );
   }
