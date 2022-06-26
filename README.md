@@ -1,2 +1,2 @@
-# pdf-shortener-svelte
-Simple Svelte web app to shorten PDFs
+# PDF Shortener
+Web app where you can shorten pages you don't need in your PDFs.
