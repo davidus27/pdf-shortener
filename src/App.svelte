@@ -1,12 +1,18 @@
 <script lang="ts" >
 	import { Button, FileDropzone, Card } from 'attractions';
 	import { ArrowLeftIcon } from 'svelte-feather-icons';
+	import { prepareDocumentProxy, renderPages } from './pdf';
 
 
 	let files = [];
 	let processing = false;
 
 	const handleDocuments = async () => {
+		const pdfDocuments = await prepareDocumentProxy(files);
+
+		// console.log(pdfDocuments);
+		renderPages(document, pdfDocuments[0]);
+
 	}
 
 	
@@ -30,10 +36,15 @@
 		{:else}
 			<Button disabled filled >Submit</Button>
 		{/if}
+
+		<Button danger filled on:click={handleDocuments} >Process</Button>
+	
+		<Button outline>
+			<div id="pdf-viewer" />
+		</Button>
 	{/if}
 
-	<Button danger filled on:click={handleDocuments} >Process</Button>
-	
+
 	
 
 
