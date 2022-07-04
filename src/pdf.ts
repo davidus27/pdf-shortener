@@ -38,8 +38,10 @@ const prepareDocumentProxy = async (files: Array<File>) => {
     return pdfTasks;
 }
 
-const processAllDocuments = async (files: any) => {
+const processAllDocuments = async (files: any): Promise<Array<number>> {
     const pdfDocuments = await prepareDocumentProxy(files);
+
+    const foundHighlight = [];
 
     for(let pdfIndex = 0; pdfIndex < pdfDocuments.length; pdfIndex++) {
         const pdfPageCount = pdfDocuments[pdfIndex].numPages;
@@ -47,11 +49,22 @@ const processAllDocuments = async (files: any) => {
         for(let pageIndex = 1; pageIndex <= pdfPageCount; pageIndex++) {
             const page = await pdfDocuments[pdfIndex].getPage(pageIndex);
             const annotations = await page.getAnnotations();
-            console.log(annotations);
+            for (let annotationIndex = 0; annotationIndex < annotations.length; annotationIndex++) {
+                const annotation = annotations[annotationIndex];
+                if (annotation.subtype === 'Link') {
+                    // console.log(annotation.url);
+                }
+                if (annotation.subtype === 'Highlight') {
+                    console.log(`Found highlight on page ${pageIndex}`);
+                    foundHighlight.push(pageIndex);
+                }
+            }
+            // console.log(annotations);
 
         }
         // console.log(pdfDocuments[fileIndex]);
     }
+    return foundHighlight;
 }
 
 
@@ -64,14 +77,17 @@ const renderPage = (pdf: any, pageNumber: number, canvas: any, scale: number) =>
     });
 }
 
-const renderPages = (document: any, pdfDocument: any, scale = 0.4) => {
+const renderPages = (document: any, pdfDocument: any, filter: Array<number>, scale = 0.4) => {
     const viewer = document.getElementById('pdf-viewer');
     
     for(let page = 1; page <= pdfDocument.numPages; page++) {
-        const canvas = document.createElement("canvas");    
-        canvas.className = 'pdf-page-canvas';         
-        viewer.appendChild(canvas);            
-        renderPage(pdfDocument, page, canvas, scale);
+        // render only pages that are in the filter
+        if(filter.includes(page)) {
+            const canvas = document.createElement("canvas");    
+            canvas.className = 'pdf-page-canvas';         
+            viewer.appendChild(canvas);            
+            renderPage(pdfDocument, page, canvas, scale);
+        }
     }
 }
 
