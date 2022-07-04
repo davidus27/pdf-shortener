@@ -1,54 +1,50 @@
 <script lang="ts" >
-	import { Button, FileDropzone, Card } from 'attractions';
-	import { ArrowLeftIcon } from 'svelte-feather-icons';
-	import { prepareDocumentProxy, renderPages } from './pdf';
+	import { Button, Tabs } from 'attractions';
+	// import { } from 'svelte-feather-icons';
+	
+	import Filter from './components/Filter.svelte';
+	import Footer from './components/Footer.svelte';
+	import Header from './components/Header.svelte';
+	import Processing from './components/Processing.svelte';
+	import Starter from './components/Starter.svelte';
+	import Warning from './components/Warning.svelte';
+
 
 
 	let files = [];
 	let processing = false;
-
-	const handleDocuments = async () => {
-		const pdfDocuments = await prepareDocumentProxy(files);
-
-		// console.log(pdfDocuments);
-		renderPages(document, pdfDocuments[0]);
-
-	}
+	let selectedTab = 'Main dishes';
 
 	
-</script> 
+</script>
+
 
 <main>
 
-	{#if processing}
-		<Button on:click={() => processing = false}>
-			<ArrowLeftIcon size="25"/>
-		</Button>
-		<h1>test</h1>
+
+	<Header />
+
+	{#if !processing}
+		<Starter on:files />
+		
+		<Button disabled={Boolean(files.length)} filled on:click={() => processing = true} >Submit</Button>
+		<Button on:click={() => console.log(files)} >Debug</Button>
 	{:else}
 
-		<h1>pdf shortener</h1>
-		<p>If you want to shorten your document(s), please insert them down bellow</p>
-		<FileDropzone bind:files accept=".pdf" max={20} />
+		<Processing bind:files bind:processing />
 
-		{#if files.length}
-			<Button filled on:click={() => processing = true} >Submit</Button>
-		{:else}
-			<Button disabled filled >Submit</Button>
-		{/if}
-
-		<Button danger filled on:click={handleDocuments} >Process</Button>
 	
-		<Button outline>
+		<!-- <Button outline>
 			<div id="pdf-viewer" />
 		</Button>
-	{/if}
+		<Warning /> -->
 
+	{/if}	
 
-	
-
+	<Footer />
 
 </main>
+
 
 <style>
 	main {
@@ -56,13 +52,6 @@
 		padding: 1em;
 		max-width: 240px;
 		margin: 0 auto;
-	}
-
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
 	}
 
 	@media (min-width: 640px) {
