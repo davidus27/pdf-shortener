@@ -25,8 +25,19 @@
 
 <div>
   <Filter />
-  <Filter />
-  <Filter />
 
-  <Button danger filled on:click={handleDocuments}>Process</Button>
+  <div class="process-btn">
+    <Button danger filled on:click={handleDocuments}>Process</Button>
+  </div>
 </div>
+
+
+<style>
+
+  /* move submit-btn to the relative right side of the screen */
+  .process-btn {
+    float:right;
+    /* add some padding */
+    padding: 20px;
+  }
+</style>
