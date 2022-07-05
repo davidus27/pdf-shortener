@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Breadcrumbs, Chip, Card, Divider } from "attractions";
+  import { Button, Breadcrumbs, Chip } from "attractions";
   import { HomeIcon, ArrowRightIcon, GithubIcon } from "svelte-feather-icons";
 
   export let items: { href: string; text: string }[];
@@ -29,32 +29,19 @@
   </div>
 </div>
 
-
-<Divider />
-
 <style>
 
-  /* navbar will be alligned horizonarally at the same level */
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 1rem;
-  }
-
-  /*
+    /*
+    navbar will be alligned horizonarally at the same level
     breadcrumbs will be alligned to the left corner
     github button will be alligned to the right corner
-  */
-  .breadcrumbs {
+    */
+  .navbar {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 15px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
-  .github-button {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
   }
 
 
