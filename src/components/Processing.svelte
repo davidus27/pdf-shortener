@@ -1,35 +1,32 @@
 <script lang="ts">
-    import { Button, Breadcrumbs, Chip } from 'attractions';
-	  import { HomeIcon, ArrowRightIcon, XIcon, ArrowLeftIcon } from 'svelte-feather-icons';
+  import { Button } from "attractions";
+  import { ArrowLeftIcon } from "svelte-feather-icons";
 
-    import { prepareDocumentProxy, renderPages, processAllDocuments } from '../pdf';
-import Filter from './Filter.svelte';
+  import {
+    prepareDocumentProxy,
+    renderPages,
+    processAllDocuments,
+  } from "../pdf";
+  import Filter from "./Filter.svelte";
 
+  export let moveNext = () => {};
+  export let files: Array<File>;
 
-    export let files : Array<File>;
-    export let processing : boolean;
+  const handleDocuments = async () => {
+    const pdfDocuments = await prepareDocumentProxy(files);
+    const indexes = await processAllDocuments(files);
 
-    const handleDocuments = async () => {
-      const pdfDocuments = await prepareDocumentProxy(files);
-      const indexes = await processAllDocuments(files);
+    console.log(indexes);
+    // renderPages(document, pdfDocuments[0], indexes);
 
-      // console.log(pdfDocuments);
-      renderPages(document, pdfDocuments[0], indexes);
-
-	}
-
-
+    moveNext();
+  };
 </script>
 
 <div>
+  <Filter />
+  <Filter />
+  <Filter />
 
-    <!-- Back button  -->
-    <Button on:click={() => {processing = false}}>
-        <ArrowLeftIcon size="25"/>
-    </Button>
-
-    <Filter />
-
-    <Button danger filled on:click={handleDocuments} >Process</Button>
-
+  <Button danger filled on:click={handleDocuments}>Process</Button>
 </div>
