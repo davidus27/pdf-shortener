@@ -7,7 +7,12 @@
     Slider,
     TextField,
     Autocomplete,
+    Headline,
+    Subhead,
+    Label
   } from "attractions";
+
+  import PageRange from "./PageRange.svelte";
 
   import { PlusIcon } from "svelte-feather-icons";
 
@@ -19,8 +24,8 @@
 
   let ranges = [
     {
-      start: 0,
-      end: 9,
+      start: 1,
+      end: 10,
     },
   ];
 
@@ -30,7 +35,7 @@
   }
 
   async function* getOptions(text: string) {
-    await sleep(1000);
+    // await sleep(1000);
     yield [
       { name: text, details: "Optional" },
       { name: `it highlights the match: ${text}` },
@@ -38,56 +43,55 @@
   }
 </script>
 
-<div>
-  <h1>Processing</h1>
-  <h2>Find pages that contain...</h2>
+<div class="filter">
+  <Headline>Processing</Headline>
+  <Subhead>Find pages that contain...</Subhead>
 
-  <FormField name="Text:" optional>
+  <FormField name="Pages containing text:" optional>
     <Autocomplete {getOptions} />
-  </FormField>
-
-  <FormField name="Links:" errors={[linkClicked && "Not happy enough"]}>
-    <Switch bind:value={linkClicked} />
   </FormField>
 
   <FormField
     name="Highlights:"
-    errors={[highlightsClicked && "Not happy enough"]}
+    errors={[highlightsClicked && "PDF pages containing highlighted annotations."]}
   >
     <Switch bind:value={highlightsClicked} />
   </FormField>
 
-  <FormField name="Images:" errors={[imagesClicked && "Not happy enough"]}>
+  <FormField name="Links:" errors={[linkClicked && "PDF pages containing links."]}>
+    <Switch bind:value={linkClicked} />
+  </FormField>
+
+  <FormField name="Images:" errors={[imagesClicked && "PDF pages containing images."]}>
     <Switch bind:value={imagesClicked} />
   </FormField>
 
-  <Divider text="OR" />
+  <Divider text="AND" />
 
   <h2>Filter pages...</h2>
+  <PageRange />
+  
 
-  <FormField name="Text:" optional>
-    <TextField />
-    <Button
-      on:click={() => {
-        ranges.push({
-          start: 0,
-          end: 100,
-        });
-        ranges = ranges;
-      }}
-    >
-      <PlusIcon size="25" />
-    </Button>
+  <Divider />
+  <Button
+    on:click={() => {
+      
+    }}
+  >
+    <PlusIcon size="25" />
+  </Button>
 
-    {#each ranges as range}
-      <Slider
-        value={[2, 4]}
-        min={range["start"]}
-        max={range["end"]}
-        step={1}
-        tooltips="never"
-        ticks={{ mode: "values", values: [1, 3, 5, 7, 9] }}
-      />
-    {/each}
-  </FormField>
 </div>
+
+<style>
+  /* make filter center */
+  .filter {
+    justify-content: center;
+    /* add padding */
+    padding: 1em;
+    /* make filter fit the viewport */
+    max-width: 100vw;
+    margin: 0 auto;
+
+  }
+</style>
