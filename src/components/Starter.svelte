@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SnackbarContainer, FileDropzone, Button, Subhead } from "attractions";
+  import { SnackbarContainer, FileDropzone, Button, Headline, Subhead } from "attractions";
   import { SnackbarPositions } from "attractions/snackbar";
 import Info from "./Info.svelte";
 import Warning from "./Warning.svelte";
@@ -76,7 +76,7 @@ import Warning from "./Warning.svelte";
   h1 {
     color: #ff3e00;
     text-transform: uppercase;
-    font-size: 4em;
+    font-size: 5.9vw;
     font-weight: 100;
   }
 
@@ -84,12 +84,12 @@ import Warning from "./Warning.svelte";
   move starter slighltly closer to the vertical center
   add it side padding
   */
-  .starter {
+  /* .starter {
     margin-top: 7em;
     position: relative;
     top: -50px;
     padding: 20px;
-  }
+  } */
 
   /* move submit-btn to the relative right side of the screen */
   .submit-btn {
