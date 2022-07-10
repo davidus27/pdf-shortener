@@ -30,6 +30,8 @@
       { name: `it highlights the match: ${text}` },
     ];
   }
+
+  export let pageCount: number = 0;
 </script>
 
 <div class="filter">
@@ -58,7 +60,7 @@
   <Divider text="AND" />
 
   <h2>Filter pages...</h2>
-  <PageRange bind:textRange={formData.textRange} />
+  <PageRange bind:textRange={formData.textRange} bind:pageCount/>
   
 
   <Divider />

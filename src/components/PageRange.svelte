@@ -2,14 +2,9 @@
   import { Button, FormField, Slider, TextField, Label } from "attractions";
   import { PlusIcon } from "svelte-feather-icons";
 
-  export let pageCount: number = Math.ceil(Math.random() * 100);
+  export let pageCount: number;
 
-  let ranges = [
-    {
-      start: 1,
-      end: pageCount,
-    },
-  ];
+  let ranges = [];
   export let textRange = "";
 
   // function that appends text range from slider values
