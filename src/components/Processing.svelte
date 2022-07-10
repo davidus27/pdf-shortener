@@ -12,6 +12,8 @@
   export let moveNext = () => {};
   export let files: Array<File>;
 
+  let processingState: any;
+
   const handleDocuments = async () => {
     const pdfDocuments = await prepareDocumentProxy(files);
     const indexes = await processAllDocuments(files);
@@ -19,12 +21,14 @@
     console.log(indexes);
     // renderPages(document, pdfDocuments[0], indexes);
 
+    console.log("test", processingState);
+
     moveNext();
   };
 </script>
 
 <div>
-  <Filter />
+  <Filter bind:formData={processingState} />
 
   <div class="process-btn">
     <Button danger filled on:click={handleDocuments}>Process</Button>
