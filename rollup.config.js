@@ -6,8 +6,22 @@ import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import css from 'rollup-plugin-css-only';
+import json from '@rollup/plugin-json';
 
 const production = !process.env.ROLLUP_WATCH;
+
+const WarningBlacklist = [
+	'Circular dependency: node_modules/pdf-lib/es/api/PDFDocument.js -> node_modules/pdf-lib/es/api/PDFEmbeddedPage.js -> node_modules/pdf-lib/es/api/PDFDocument.js',
+	'Circular dependency: node_modules/pdf-lib/es/api/PDFDocument.js -> node_modules/pdf-lib/es/api/PDFFont.js -> node_modules/pdf-lib/es/api/PDFDocument.js',
+	'Circular dependency: node_modules/pdf-lib/es/api/PDFDocument.js -> node_modules/pdf-lib/es/api/PDFImage.js -> node_modules/pdf-lib/es/api/PDFDocument.js',
+  ];
+  
+// Silence circular dependency warnings we don't care about
+const onwarn = (warning, warn) => {
+	if (WarningBlacklist.includes(warning.message)) return;
+	warn(warning);
+};
+
 
 function serve() {
 	let server;
@@ -64,6 +78,7 @@ export default {
 			sourceMap: !production,
 			inlineSources: !production
 		}),
+		json(),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
