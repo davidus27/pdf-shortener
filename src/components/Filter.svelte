@@ -16,26 +16,15 @@
 
   import { PlusIcon } from "svelte-feather-icons";
 
-  let containsText = "";
-  let linkClicked = false;
-  let highlightsClicked = false;
-  let imagesClicked = false;
-  let pageIndexes = "";
-
-  let ranges = [
-    {
-      start: 1,
-      end: 10,
-    },
-  ];
-
-  // define the sleep function for async/await
-  function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
+  export let formData = {
+    containsText: [],
+    linkClicked: false,
+    highlightsClicked: false,
+    imagesClicked: false,
+    textRange: ""
+  };
 
   async function* getOptions(text: string) {
-    // await sleep(1000);
     yield [
       { name: text, details: "Optional" },
       { name: `it highlights the match: ${text}` },
@@ -48,34 +37,34 @@
   <Subhead>Find pages that contain...</Subhead>
 
   <FormField name="Pages containing text:" optional>
-    <Autocomplete {getOptions} />
+    <Autocomplete {getOptions} bind:selection={formData.containsText} />
   </FormField>
 
   <FormField
     name="Highlights:"
-    errors={[highlightsClicked && "PDF pages containing highlighted annotations."]}
+    errors={[formData.highlightsClicked && "PDF pages containing highlighted annotations."]}
   >
-    <Switch bind:value={highlightsClicked} />
+    <Switch bind:value={formData.highlightsClicked} />
   </FormField>
 
-  <FormField name="Links:" errors={[linkClicked && "PDF pages containing links."]}>
-    <Switch bind:value={linkClicked} />
+  <FormField name="Links:" errors={[formData.linkClicked && "PDF pages containing links."]}>
+    <Switch bind:value={formData.linkClicked} />
   </FormField>
 
-  <FormField name="Images:" errors={[imagesClicked && "PDF pages containing images."]}>
-    <Switch bind:value={imagesClicked} />
+  <FormField name="Images:" errors={[formData.imagesClicked && "PDF pages containing images."]}>
+    <Switch bind:value={formData.imagesClicked} />
   </FormField>
 
   <Divider text="AND" />
 
   <h2>Filter pages...</h2>
-  <PageRange />
+  <PageRange bind:textRange={formData.textRange} />
   
 
   <Divider />
   <Button
     on:click={() => {
-      
+      console.log(formData);
     }}
   >
     <PlusIcon size="25" />
