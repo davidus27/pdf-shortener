@@ -6,63 +6,68 @@ if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
 }
 
 
-const processDocument = (inputFile: File) => {
-    const temporaryFileReader = new FileReader();
+// define PDF document processing class
+abstract class DocumentProcessor {
 
-    return new Promise((resolve, reject) => {
-            temporaryFileReader.onerror = function() {
-            temporaryFileReader.abort();
-            reject(new DOMException("Problem parsing input file."));
-        };
-        temporaryFileReader.onload = function() {
-            const typedarray = new Uint8Array(this.result as ArrayBufferLike);
-            const pdfTask = pdfjsLib.getDocument(typedarray);
-            resolve(pdfTask);
-        };
-        temporaryFileReader.readAsArrayBuffer(inputFile);
-    });
-};
-
-const prepareDocumentProxy = async (files: Array<File>) => {
-
-    if(!files && !files.length)
-        return;
-
-    const pdfTasks = [];
-    for(let fileIndex = 0; fileIndex < files.length; fileIndex++) {
-        const documentProxy: any = await processDocument(files[fileIndex]);
-        // const x = documentProxy.promise;
-        pdfTasks.push(await documentProxy.promise);
+    public static processDocument(inputFile: File){
+        const temporaryFileReader = new FileReader();
+    
+        return new Promise((resolve, reject) => {
+                temporaryFileReader.onerror = function() {
+                temporaryFileReader.abort();
+                reject(new DOMException("Problem parsing input file."));
+            };
+            temporaryFileReader.onload = function() {
+                const typedarray = new Uint8Array(this.result as ArrayBufferLike);
+                const pdfTask = pdfjsLib.getDocument(typedarray);
+                resolve(pdfTask);
+            };
+            temporaryFileReader.readAsArrayBuffer(inputFile);
+        });
     }
 
-    return pdfTasks;
-}
+    public static async prepareDocumentProxy(files: Array<File>) {
 
-const processAllDocuments = async (files: any): Promise<Array<number>> => {
-    const pdfDocuments = await prepareDocumentProxy(files);
+        if(!files && !files.length)
+            return;
+    
+        const pdfTasks = [];
+        for(let fileIndex = 0; fileIndex < files.length; fileIndex++) {
+            const documentProxy: any = await this.processDocument(files[fileIndex]);
+            // const x = documentProxy.promise;
+            pdfTasks.push(await documentProxy.promise);
+        }
+    
+        return pdfTasks;
+    }
 
-    const foundHighlight = [];
-
-    for(let pdfIndex = 0; pdfIndex < pdfDocuments.length; pdfIndex++) {
-        const pdfPageCount = pdfDocuments[pdfIndex].numPages;
-        
-        for(let pageIndex = 1; pageIndex <= pdfPageCount; pageIndex++) {
-            const page = await pdfDocuments[pdfIndex].getPage(pageIndex);
-            const annotations = await page.getAnnotations();
-            for (let annotationIndex = 0; annotationIndex < annotations.length; annotationIndex++) {
-                const annotation = annotations[annotationIndex];
-                if (annotation.subtype === 'Link') {
-                    // console.log(annotation.url);
-                }
-                if (annotation.subtype === 'Highlight') {
-                    console.log(`Found highlight on page ${pageIndex}`);
-                    foundHighlight.push(pageIndex);
+    public static async processAllDocuments(files: any): Promise<Array<number>> {
+        const pdfDocuments = await this.prepareDocumentProxy(files);
+    
+        const foundHighlight = [];
+    
+        for(let pdfIndex = 0; pdfIndex < pdfDocuments.length; pdfIndex++) {
+            const pdfPageCount = pdfDocuments[pdfIndex].numPages;
+            
+            for(let pageIndex = 1; pageIndex <= pdfPageCount; pageIndex++) {
+                const page = await pdfDocuments[pdfIndex].getPage(pageIndex);
+                const annotations = await page.getAnnotations();
+                for (let annotationIndex = 0; annotationIndex < annotations.length; annotationIndex++) {
+                    const annotation = annotations[annotationIndex];
+                    if (annotation.subtype === 'Link') {
+                        // console.log(annotation.url);
+                    }
+                    if (annotation.subtype === 'Highlight') {
+                        console.log(`Found highlight on page ${pageIndex}`);
+                        foundHighlight.push(pageIndex);
+                    }
                 }
             }
         }
+        return foundHighlight;
     }
-    return foundHighlight;
 }
+
 
 // define class for pdf viewer
 class PdfViewer {
@@ -77,17 +82,21 @@ class PdfViewer {
         // this.scale = scale;
     }
 
-    public async load() {
-        this.pdfDocuments = await prepareDocumentProxy(this.files);
+    public async process() {
+        this.pdfDocuments = await DocumentProcessor.prepareDocumentProxy(this.files);
+    }
+
+    public getPdfDocuments() {
+        return this.pdfDocuments;
     }
 
     // get the pdf document indexes based on the indexes
     public getPdfDocumentIndexes() {
-        return processAllDocuments(this.files);
+        return DocumentProcessor.processAllDocuments(this.files);
     }
 
     private renderPage(pdf: any, pageNumber: number, canvas: any, scale: number) {
-        pdf.getPage(pageNumber).then(function(page: any) {
+        pdf.getPage(pageNumber).then((page: any) => {
           const viewport = page.getViewport({ scale: scale });
           canvas.height = viewport.height;
           canvas.width = viewport.width;          
@@ -95,7 +104,7 @@ class PdfViewer {
         });
     }
 
-    public renderPages(filter: Array<number>, scale = 0.4) {
+    public renderPages(indexes: Array<number>, scale = 0.4) {
         const viewer = document.getElementById('pdf-viewer');
 
         // remove all children
@@ -104,7 +113,7 @@ class PdfViewer {
         }
 
         // increase the filter by 1 for each page
-        const increased_filter = filter.map((pageNumber) => pageNumber + 1);
+        const increased_filter = indexes.map((pageNumber) => pageNumber + 1);
 
         for(let page = 1; page <= this.pdfDocuments[0].numPages; page++) {
             // render only pages that are in the filter
