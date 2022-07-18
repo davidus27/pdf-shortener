@@ -1,14 +1,5 @@
 import { PDFDocument } from 'pdf-lib';
 
-const downloadFile = (content: any, mimeType: string, filename: string) => {
-    const a = document.createElement('a')
-    const blob = new Blob([content], {type: mimeType})
-    const url = URL.createObjectURL(blob)
-    a.setAttribute('href', url)
-    a.setAttribute('download', filename)
-    a.click()
-};
-
 // create DocumentCutter class
 export default class DocumentCutter {
     // define attributes
@@ -19,6 +10,7 @@ export default class DocumentCutter {
     constructor(file: File) {
         this.file = file;
     }
+
 
     private async prepareDocument(): Promise<ArrayBuffer | string> {
         return new Promise((resolve, reject): void =>  {
@@ -48,15 +40,23 @@ export default class DocumentCutter {
             }
         }
     }
+    
+    private downloadFile(content: any, mimeType: string, filename: string) {
+        const a = document.createElement('a')
+        const blob = new Blob([content], {type: mimeType})
+        const url = URL.createObjectURL(blob)
+        a.setAttribute('href', url)
+        a.setAttribute('download', filename)
+        a.click()
+    }
 
     // download pdf file
-    async download(fileName: string) {
+    public async download(fileName: string) {
         // if pdfDoc is not defined, initialize it and download the initial file
         if(!this.pdfDoc) await this.load();
         
         const pdfBytes = await this.pdfDoc.save();
-        downloadFile(pdfBytes, 'application/pdf', fileName);
-
+        this.downloadFile(pdfBytes, 'application/pdf', fileName);
     }
 
     // create new pdf document from current pdf document
