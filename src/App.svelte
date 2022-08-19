@@ -122,6 +122,13 @@
     flex-direction:column;
   }
 
+  /* make buttons horizontally alligned */
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1em;
+  }
+
   @media (min-width: 640px) {
     main {
       max-width: none;
