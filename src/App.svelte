@@ -13,6 +13,8 @@
   let breadcrumbsPath = [{ href: "/", text: "Home" }];
 
   const views = [Starter, Processing, Preview];
+  // const views = [Starter, Preview];
+
 
   const path = [
     { href: "/", text: "Home" },
@@ -23,33 +25,38 @@
   let currentView = 0;
   let viewComponent = views[currentView];
 
-  const updateView = () => {
+  const updateView = (newProps: Object) => {
     viewComponent = views[currentView];
+    // set addtional props to the view component
+    if (newProps) {
+      props = { ...props, ...newProps };
+    }
     breadcrumbsPath = path.slice(0, currentView + 1);
   };
 
-  const moveNext = () => {
+  const moveNext = (newProps = null) => {
     // check if we are at the last view
     if (currentView === views.length - 1) {
       return;
     }
     currentView++;
-    updateView();
+    updateView(newProps);
   };
 
-  const movePrevious = () => {
+  const movePrevious = (newProps = null) => {
     // check if we are at the first view
     if (currentView === 0) {
       return;
     }
     currentView--;
-    updateView();
+    updateView(newProps);
   };
 
   const reset = () => {
     currentView = 0;
-    updateView();
+    updateView(null);
   };
+
 
 
   const saveAlert = (e: any) => {
