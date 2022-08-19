@@ -1,73 +1,137 @@
-<script lang="ts" >
-	import { Button, FileDropzone, Card } from 'attractions';
-	import { ArrowLeftIcon } from 'svelte-feather-icons';
-	import { prepareDocumentProxy, renderPages } from './pdf';
+<script lang="ts">
+  import { fade } from "svelte/transition";
+  import { Button } from "attractions";
+  import { ArrowLeftIcon, XIcon } from "svelte-feather-icons";
+
+  import Footer from "./components/Footer.svelte";
+  import Header from "./components/Header.svelte";
+  import Processing from "./components/Processing.svelte";
+  import Starter from "./components/Starter.svelte";
+  import Preview from "./components/Preview.svelte";
+
+  let files = [];
+  let breadcrumbsPath = [{ href: "/", text: "Home" }];
+
+  const views = [Starter, Processing, Preview];
+  // const views = [Starter, Preview];
 
 
-	let files = [];
-	let processing = false;
+  const path = [
+    { href: "/", text: "Home" },
+    { href: "/processing", text: "Processing" },
+    { href: "/preview", text: "Preview" },
+  ];
 
-	const handleDocuments = async () => {
-		const pdfDocuments = await prepareDocumentProxy(files);
+  let currentView = 0;
+  let viewComponent = views[currentView];
 
-		// console.log(pdfDocuments);
-		renderPages(document, pdfDocuments[0]);
+  const updateView = (newProps: Object) => {
+    viewComponent = views[currentView];
+    // set addtional props to the view component
+    if (newProps) {
+      props = { ...props, ...newProps };
+    }
+    breadcrumbsPath = path.slice(0, currentView + 1);
+  };
 
-	}
+  const moveNext = (newProps = null) => {
+    // check if we are at the last view
+    if (currentView === views.length - 1) {
+      return;
+    }
+    currentView++;
+    updateView(newProps);
+  };
 
-	
-</script> 
+  const movePrevious = (newProps = null) => {
+    // check if we are at the first view
+    if (currentView === 0) {
+      return;
+    }
+    currentView--;
+    updateView(newProps);
+  };
+
+  const reset = () => {
+    currentView = 0;
+    updateView(null);
+  };
+
+
+
+  const saveAlert = (e: any) => {
+    if (files.length == 0) {
+      return;
+    }
+    if(!e) e = window.event;
+    //e.cancelBubble is supported by IE - this will kill the bubbling process.
+    e.cancelBubble = true;
+    //This is displayed on the dialog box.
+    e.returnValue = 'Are you sure you want to leave? All the progress will be removed'; 
+    //e.stopPropagation works in Firefox.
+    if (e.stopPropagation) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+  }
+  // window.onbeforeunload = saveAlert; 
+  window.onbeforeprint = undefined;
+
+  let props = {
+    files,
+    moveNext,
+  };
+
+</script>
 
 <main>
+  <Header bind:items={breadcrumbsPath} />
 
-	{#if processing}
-		<Button on:click={() => processing = false}>
-			<ArrowLeftIcon size="25"/>
-		</Button>
-		<h1>test</h1>
-	{:else}
+  <div id="viewport" on:outroend={updateView} transition:fade>
+    {#if currentView > 0}
+      <div class="buttons">
+        <Button on:click={movePrevious} round small>
+          <ArrowLeftIcon size="20" />
+        </Button>
+        <Button on:click={reset} round small>
+          <XIcon size="20" />
+        </Button>
+      </div>
+    {/if}
+    <svelte:component this={viewComponent} {...props} />
+  </div>
 
-		<h1>pdf shortener</h1>
-		<p>If you want to shorten your document(s), please insert them down bellow</p>
-		<FileDropzone bind:files accept=".pdf" max={20} />
-
-		{#if files.length}
-			<Button filled on:click={() => processing = true} >Submit</Button>
-		{:else}
-			<Button disabled filled >Submit</Button>
-		{/if}
-
-		<Button danger filled on:click={handleDocuments} >Process</Button>
-	
-		<Button outline>
-			<div id="pdf-viewer" />
-		</Button>
-	{/if}
-
-
-	
-
-
+  <!-- <Footer /> -->
 </main>
 
+
 <style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
+  main {
+    text-align: center;
+    padding: 1em;
+    max-width: 240px;
+    margin: 0 auto;
+  }
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
+  /* set viewport to the flexbox */
+  #viewport {
+    height:100vh; 
+    margin:0;
+    min-height:50px;
+    display:flex; 
+    flex-direction:column;
+  }
 
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
+  /* make buttons horizontally alligned */
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1em;
+  }
+
+  @media (min-width: 640px) {
+    main {
+      max-width: none;
+    }
+  }
 </style>
