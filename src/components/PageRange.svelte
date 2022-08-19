@@ -50,7 +50,7 @@
 
 <div class="textfield">
   <FormField name="Page range:">
-    <TextField placeholder="e.g. 1-5,8,11-13" bind:value={textRange} />
+    <TextField class="page-range-input" placeholder="e.g. 1-5,8,11-13" bind:value={textRange} />
 
     {#each ranges as range}
 
