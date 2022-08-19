@@ -179,30 +179,25 @@ class DocumentProcessor {
             const pdfPageCount = this.documentProxies[pdfIndex].numPages;
             
             // initialize the array of page numbers full of 0
-            const pageNumbers = new Array(pdfPageCount).fill(false);
+            const pageNumbers = new Array(pdfPageCount).fill(true);
 
             for(let pageIndex = 1; pageIndex <= pdfPageCount; pageIndex++) {
                 const page = await this.documentProxies[pdfIndex].getPage(pageIndex);
                 
                 const annotations = await page.getAnnotations();
 
-                if(filters.hasHighlights && this.isHighlighted(annotations)) {
-                    pageNumbers[pageIndex - 1] = true;
-                }
+                const highlight = filters.hasHighlights && this.isHighlighted(annotations);
+                const links = filters.hasLinks && this.hasLinks(annotations);
+                const images = filters.hasImages && await this.hasImages(page);
 
-                if(filters.hasLinks && this.hasLinks(annotations)) {
-                    pageNumbers[pageIndex - 1] = true;
-                }
-
-                const containsImages = await this.hasImages(page);
-                if(filters.hasImages && containsImages) {
-                    pageNumbers[pageIndex - 1] = true;
-                }
-                
+                let range = true;
                 if(filters.textRange) {
-                    // get me pages on this range ONLY if they apply for the previous filters
-                    pageNumbers[pageIndex - 1] &&= this.isInRange(filters.textRange, pageIndex);
+                    range = this.isInRange(filters.textRange, pageIndex);
                 }
+
+                const result = (highlight || links || images) && range;
+
+                pageNumbers[pageIndex - 1] = result;
 
             }
             filteredPages.push(pageNumbers);
