@@ -1,47 +1,30 @@
 <script lang="ts">
   import { Button, Card, H1 } from "attractions";
-  import { PdfViewer } from "../pdf";
-  import DocumentCutter from '../DocumentCutter';
+  import ExecuteProcesses from '../executor';
 
-  export let moveNext = () => {};
+  import { onMount } from 'svelte';
+
   export let files: Array<File>;
-  let formData: any = {
-    containsText: [],
-    linkClicked: false,
-    highlightsClicked: true,
-    imagesClicked: false,
-    textRange: ""
-  };
+  export let formData: any;
 
-  let indexes: Array<number> = [0,1,2];
+  
+  let executor = new ExecuteProcesses(files, formData);
 
-  const handleDocuments = async () => {
-    const pdfViewerObj = new PdfViewer(files, formData);
-
-    await pdfViewerObj.load();
-    pdfViewerObj.renderPages(indexes);
-
-    moveNext();
-  };
+  onMount(async () => {
+    await executor.renderDocuments();
+	});
 
   const handleDownload = async () => {
-    // iterate over files and download each one
-    for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
-      const dc = new DocumentCutter(files[fileIndex]);
-      const name = files[fileIndex].name.slice(0, -4);
-      await dc.processDocument(indexes, `${ name }_new_version_${fileIndex + 1}.pdf`);
-    }
+    await executor.downloadAllDocuments();
   }
-
-  handleDocuments();
 
 </script>
 
 <div>
   <H1>Preview</H1>
 
-
-  <Card>
+  <!-- <div id='pdf-viewer'></div> -->
+  <Card id='pdf-viewer'>
     <div id='pdf-viewer'></div>
   </Card>
 
