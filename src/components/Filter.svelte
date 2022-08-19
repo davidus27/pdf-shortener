@@ -9,19 +9,20 @@
     Autocomplete,
     Headline,
     Subhead,
-    Label
+    Label,
   } from "attractions";
+  import type { DocumentFilters } from "../pdf";
 
   import PageRange from "./PageRange.svelte";
 
   import { PlusIcon } from "svelte-feather-icons";
 
-  export let formData = {
-    containsText: [],
-    linkClicked: false,
-    highlightsClicked: false,
-    imagesClicked: false,
-    textRange: ""
+  export let formData: DocumentFilters = {
+    containsTexts: [],
+    hasHighlights: false,
+    hasImages: false,
+    hasLinks: false,
+    textRange: "",
   };
 
   async function* getOptions(text: string) {
@@ -31,37 +32,44 @@
     ];
   }
 
-  export let pageCount: number = 0;
+  export let pageCount: number;
 </script>
 
 <div class="filter">
   <Headline>Processing</Headline>
   <Subhead>Find pages that contain...</Subhead>
 
-  <FormField name="Pages containing text:" optional>
-    <Autocomplete {getOptions} bind:selection={formData.containsText} />
-  </FormField>
+  <div >
+    <FormField name="Pages containing text:" optional>
+      <Autocomplete class="pages-contains" {getOptions} bind:selection={formData.containsTexts} />
+    </FormField>
+  </div>
 
-  <FormField
-    name="Highlights:"
-    errors={[formData.highlightsClicked && "PDF pages containing highlighted annotations."]}
-  >
-    <Switch bind:value={formData.highlightsClicked} />
-  </FormField>
+    <FormField
+      name="Highlights:"
+      errors={[formData.hasHighlights && "PDF pages containing highlighted annotations."]}
+    >
+      <Switch class="highlight-switch" bind:value={formData.hasHighlights} />
+    </FormField>
 
-  <FormField name="Links:" errors={[formData.linkClicked && "PDF pages containing links."]}>
-    <Switch bind:value={formData.linkClicked} />
-  </FormField>
+    <FormField
+      name="Links:"
+      errors={[formData.hasLinks && "PDF pages containing links."]}
+    >
+      <Switch class="links-switch" bind:value={formData.hasLinks} />
+    </FormField>
 
-  <FormField name="Images:" errors={[formData.imagesClicked && "PDF pages containing images."]}>
-    <Switch bind:value={formData.imagesClicked} />
-  </FormField>
+    <FormField
+      name="Images:"
+      errors={[formData.hasImages && "PDF pages containing images."]}
+    >
+      <Switch class="images-switch" bind:value={formData.hasImages} />
+    </FormField>
 
   <Divider text="AND" />
 
   <h2>Filter pages...</h2>
-  <PageRange bind:textRange={formData.textRange} bind:pageCount/>
-  
+  <PageRange bind:textRange={formData.textRange} bind:pageCount />
 
   <Divider />
   <Button
@@ -71,7 +79,6 @@
   >
     <PlusIcon size="25" />
   </Button>
-
 </div>
 
 <style>
@@ -83,6 +90,5 @@
     /* make filter fit the viewport */
     max-width: 100vw;
     margin: 0 auto;
-
   }
 </style>
