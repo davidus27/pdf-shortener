@@ -4,7 +4,21 @@ if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
     const WORKER_URL = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
     pdfjsLib.GlobalWorkerOptions.workerSrc = WORKER_URL;
 }
-
+  
+interface DocumentFilters {
+    containsTexts: any;
+    hasLinks: boolean;
+    hasHighlights: boolean;
+    hasImages: boolean;
+    textRange: string;
+    // hasBookmarks: boolean;
+    // hasOutlines: boolean;
+    // hasThumbnails: boolean;
+    // hasFormFields: boolean;
+    // hasAnnotations: boolean;
+    // hasEmbeddedFiles: boolean;
+    // hasPageLabels: boolean;
+}
 
 // define PDF document processing class
 abstract class DocumentProcessor {
