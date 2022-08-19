@@ -104,11 +104,7 @@ class DocumentProcessor {
         this.documentProxies = await DocumentConvertor.getDocumentProxies(this.files);
     }
 
-    private isHighlightedAnnotation(annotations: Array<any>, pageIndex: number) {
-
-    }
-
-    private checkHighlights(annotations: Array<any>) {
+    private isHighlighted(annotations: Array<any>) {
         // iterate over annotations and check if they match the filter
         for(let annotationIndex = 0; annotationIndex < annotations.length; annotationIndex++) {
             const annotation = annotations[annotationIndex];
@@ -119,7 +115,7 @@ class DocumentProcessor {
         return false;
     }
 
-    private checkLinks(annotations: Array<any>, pageIndex: number) {
+    private hasLinks(annotations: Array<any>) {
         // iterate over annotations and check if they match the filter
         for(let annotationIndex = 0; annotationIndex < annotations.length; annotationIndex++) {
             const annotation = annotations[annotationIndex];
@@ -129,6 +125,49 @@ class DocumentProcessor {
         }
         return false;
     }
+
+    private async hasImages(pdfPage: pdfjsLib.PDFPageProxy) {
+        try {
+            const operatorList = await pdfPage.getOperatorList();
+        
+            const validObjectTypes = [
+                pdfjsLib.OPS.paintImageXObject, // 85
+                pdfjsLib.OPS.paintImageXObjectRepeat, // 88
+                pdfjsLib.OPS.paintJpegXObject //82
+            ];
+            
+            // iterate over operatorList and check if there is an image
+            for(let operatorIndex = 0; operatorIndex < operatorList.fnArray.length; operatorIndex++) {
+                const operator = operatorList.fnArray[operatorIndex];
+                if(validObjectTypes.includes(operator)) {
+                    const imageName = operatorList.argsArray[operatorIndex][0];
+                    // console.log('page', pdfPage, 'imageName', imageName);
+                    return true;
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+        return false;
+    }
+
+    private hasText(text: string) {
+    }
+
+    private isInRange(textRange: string, pageIndex: number) {
+        const ranges = textRange.split(',');
+        // iterate over ranges and check if they match the filter
+        for(let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
+            const range = ranges[rangeIndex];
+            const rangeParts = range.split('-');
+            const start = parseInt(rangeParts[0]);
+            const end = parseInt(rangeParts[1]);
+            if(start <= pageIndex && pageIndex <= end) {
+                return true;
+            }
+        }
+    }
+
 
 
     public async getFilteredPages(filters: DocumentFilters): Promise<number[][]> {
@@ -145,13 +184,24 @@ class DocumentProcessor {
             for(let pageIndex = 1; pageIndex <= pdfPageCount; pageIndex++) {
                 const page = await this.documentProxies[pdfIndex].getPage(pageIndex);
                 
-
-
-                // const textContent = await page.getTextContent();
                 const annotations = await page.getAnnotations();
 
-                if(filters.hasHighlights && this.checkHighlights(annotations)) {
+                if(filters.hasHighlights && this.isHighlighted(annotations)) {
                     pageNumbers[pageIndex - 1] = true;
+                }
+
+                if(filters.hasLinks && this.hasLinks(annotations)) {
+                    pageNumbers[pageIndex - 1] = true;
+                }
+
+                const containsImages = await this.hasImages(page);
+                if(filters.hasImages && containsImages) {
+                    pageNumbers[pageIndex - 1] = true;
+                }
+                
+                if(filters.textRange) {
+                    // get me pages on this range ONLY if they apply for the previous filters
+                    pageNumbers[pageIndex - 1] &&= this.isInRange(filters.textRange, pageIndex);
                 }
 
             }
