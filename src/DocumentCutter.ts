@@ -67,6 +67,5 @@ export default class DocumentCutter {
         await this.cut(indexes);
         await this.download(fileName);
     }
-
 }
 
