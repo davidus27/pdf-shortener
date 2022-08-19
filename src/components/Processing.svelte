@@ -1,30 +1,30 @@
 <script lang="ts">
   import { Button } from "attractions";
-  import { PdfViewer } from "../pdf";
+  import { PdfViewer, DocumentFilters } from "../pdf";
   import Filter from "./Filter.svelte";
 
 
-  export let moveNext = () => {};
+  export let moveNext: any
   export let files: Array<File>;
-  export let formData: any;
-
-  let indexes: Array<number> = [0, 1, 2, 3];
+  let formData: DocumentFilters;
 
   const handleDocuments = async () => {
-    moveNext();
+    console.log("handleDocuments: ", formData);
+    moveNext({
+      "formData": formData,
+    });
   };
 
-  let pageCount: number = 0;
+  let pageCount: number;
   // get pages count from pdf
-  const getPageCount = async () => {
-    const pdfViewerObj = new PdfViewer(files, formData);
-
-    await pdfViewerObj.process();
-    return pdfViewerObj.getPageCount();
+  const getPageCounts = async () => {
+    const pdfViewerObj = new PdfViewer(files);
+    await pdfViewerObj.prepareForRender();
+    return pdfViewerObj.getPageCounts();
   };
 
-  getPageCount().then((count) => {
-    pageCount = count;
+  getPageCounts().then((counts) => {
+    pageCount = counts[0];
   });
 
 </script>
