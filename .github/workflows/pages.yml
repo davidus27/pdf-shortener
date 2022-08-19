@@ -21,8 +21,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Run Cypress End-to-end integration tests to test 
+  # if the deployment is ready
+  cypress-run:
+    name: Cypress run
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v4
+        with:
+          record: false
+        env:
+          # pass GitHub token to detect new build vs re-run build
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+
   # Single deploy job since we're just deploying
   deploy:
+    needs: cypress-run
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -36,11 +55,8 @@ jobs:
         run: |
           npm install
           npm run build
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          # Upload entire repository
-          path: public
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v1
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages
+          folder: public
