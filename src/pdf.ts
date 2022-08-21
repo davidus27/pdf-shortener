@@ -6,20 +6,19 @@ if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
     const WORKER_URL = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
     pdfjsLib.GlobalWorkerOptions.workerSrc = WORKER_URL;
 }
-  
+
 interface DocumentFilters {
-    containsTexts: any;
-    hasLinks: boolean;
-    hasHighlights: boolean;
-    hasImages: boolean;
+    keywords: {
+        words: any,
+        logicOperator: "AND" | "OR";
+    },
+    checks: {
+        hasLinks: boolean;
+        hasHighlights: boolean;
+        hasImages: boolean;    
+        logicOperator: "AND" | "OR";
+    }
     textRange: string;
-    // hasBookmarks: boolean;
-    // hasOutlines: boolean;
-    // hasThumbnails: boolean;
-    // hasFormFields: boolean;
-    // hasAnnotations: boolean;
-    // hasEmbeddedFiles: boolean;
-    // hasPageLabels: boolean;
 }
 
 
@@ -140,8 +139,7 @@ class DocumentProcessor {
             for(let operatorIndex = 0; operatorIndex < operatorList.fnArray.length; operatorIndex++) {
                 const operator = operatorList.fnArray[operatorIndex];
                 if(validObjectTypes.includes(operator)) {
-                    const imageName = operatorList.argsArray[operatorIndex][0];
-                    // console.log('page', pdfPage, 'imageName', imageName);
+                    // const imageName = operatorList.argsArray[operatorIndex][0];
                     return true;
                 }
             }
@@ -204,20 +202,7 @@ class DocumentProcessor {
             for(let pageIndex = 1; pageIndex <= pdfPageCount; pageIndex++) {
                 const page = await this.documentProxies[pdfIndex].getPage(pageIndex);
                 
-                const annotations = await page.getAnnotations();
-
-                const highlight = filters.hasHighlights && this.isHighlighted(annotations);
-                const links = filters.hasLinks && this.hasLinks(annotations);
-                const images = filters.hasImages && await this.hasImages(page);
-
-                let range = true;
-                if(filters.textRange) {
-                    range = this.isInRange(filters.textRange, pageIndex);
-                }
-
-                const result = (highlight || links || images) && range;
-
-                pageNumbers[pageIndex - 1] = result;
+                pageNumbers[pageIndex - 1] = await this.calculatePageFilters(page, filters);
 
             }
             filteredPages.push(pageNumbers);
@@ -241,7 +226,6 @@ class DocumentProcessor {
     }
 
 }
-
 
 
 // define class for pdf viewer
