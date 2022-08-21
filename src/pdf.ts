@@ -168,6 +168,26 @@ class DocumentProcessor {
         }
     }
 
+    private async calculatePageFilters(page: pdfjsLib.PDFPageProxy, filters: DocumentFilters): Promise<boolean> {
+        const annotations = await page.getAnnotations();
+        const pageIndex = page._pageIndex;
+        const highlight = filters.checks.hasHighlights && this.isHighlighted(annotations);
+        const links = filters.checks.hasLinks && this.hasLinks(annotations);
+        const images = filters.checks.hasImages && await this.hasImages(page);
+
+        let range = true;
+        range = filters.textRange ? this.isInRange(filters.textRange, pageIndex) : true;
+
+        let result = (highlight || links || images);
+
+        if(filters.checks.logicOperator === 'AND') {
+            result &&= range;
+        } else if(filters.checks.logicOperator === 'OR') {
+            result ||= range;
+        }
+
+        return result;
+    }
 
 
     public async getFilteredPages(filters: DocumentFilters): Promise<number[][]> {
