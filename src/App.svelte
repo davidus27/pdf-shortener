@@ -7,19 +7,19 @@
   import Header from "./components/Header.svelte";
   import Processing from "./components/Processing.svelte";
   import Starter from "./components/Starter.svelte";
-  import Preview from "./components/Preview.svelte";
+  import Review from "./components/Review.svelte";
 
   let files = [];
   let breadcrumbsPath = [{ href: "/", text: "Home" }];
 
-  const views = [Starter, Processing, Preview];
-  // const views = [Starter, Preview];
+  const views = [Starter, Processing, Review];
+  // const views = [Starter, Review];
 
 
   const path = [
     { href: "/", text: "Home" },
-    { href: "/processing", text: "Processing" },
-    { href: "/preview", text: "Preview" },
+    { href: "/checkout", text: "Checkout" },
+    { href: "/review", text: "Review" },
   ];
 
   let currentView = 0;
@@ -106,6 +106,7 @@
 
 
 <style>
+
   main {
     text-align: center;
     padding: 1em;

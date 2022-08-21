@@ -49,7 +49,10 @@
 </script>
 
 <div class="textfield">
-  <FormField name="Page range:">
+  <FormField 
+    name="Page ranges:"
+    help="Enter page ranges separated by commas. Or use interactive slider by selecting 'Add new range'."
+    >
     <TextField class="page-range-input" placeholder="e.g. 1-5,8,11-13" bind:value={textRange} />
 
     {#each ranges as range}
@@ -98,6 +101,7 @@
           ranges = ranges;
         }}
       >
+      Add new range &nbsp;
         <PlusIcon size="25" />
       </Button>
     </div>
