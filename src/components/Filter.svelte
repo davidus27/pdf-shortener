@@ -10,7 +10,7 @@
     H2,
     Card,
   } from "attractions";
-  import type { DocumentFilters } from "../pdf";
+  import type { DocumentFilters } from "../core/PDFLogic";
   import MyDivider from "./Divider.svelte";
 
   import PageRange from "./PageRange.svelte";

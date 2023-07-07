@@ -8,7 +8,9 @@
     H2,
     Subhead,
   } from "attractions";
-  import ExecuteProcesses from "../executor";
+  
+  import {Executor as ExecuteProcesses }  from "../core";
+
   import { ChevronDownIcon } from "svelte-feather-icons";
   import { onMount } from "svelte";
   import InfoSummary from "./InfoSummary.svelte";
@@ -16,13 +18,15 @@
   export let files: Array<File>;
   export let formData: any;
 
-  let originalPageCount = 25;
-  let newPageCount = 5;
+  let originalPageCount: number[];
+  let newPageCount: number[];
 
   let executor = new ExecuteProcesses(files, formData);
 
   onMount(async () => {
     await executor.renderDocuments();
+    originalPageCount = executor.getOriginalPageCount();
+    newPageCount = await executor.getPageCount();
   });
 
   const handleDownload = async () => {
@@ -32,7 +36,7 @@
 
 <div>
   <Headline>Summary</Headline>
-  <InfoSummary bind:files bind:originalPageCount bind:newPageCount />
+  <!-- <InfoSummary bind:files bind:originalPageCount bind:newPageCount /> -->
 
   <!-- Preview -->
   <Accordion let:closeOtherPanels>

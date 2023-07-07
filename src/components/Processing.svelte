@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button } from "attractions";
-  import { PdfViewer, DocumentFilters } from "../pdf";
+  import { PdfViewer, DocumentFilters } from "../core";
   import Filter from "./Filter.svelte";
 
   export let moveNext: any;
