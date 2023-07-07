@@ -1,7 +1,13 @@
+/**
+ * This file defines core functions with PDFs
+ * Finding the necessary metadata in pdf documents, creating new documents, downloading etc.
+ * reading is mainly done using PDF.JS and creating of documents uses PDF-lib
+*/
+
 import * as pdfjsLib from 'pdfjs-dist';
 import { PDFDocument } from 'pdf-lib';
 
-
+// set up the PDFJS worker
 if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
     const WORKER_URL = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
     pdfjsLib.GlobalWorkerOptions.workerSrc = WORKER_URL;

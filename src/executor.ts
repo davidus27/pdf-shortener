@@ -1,3 +1,8 @@
+/**
+ * The executor is an exposed object to the svelte UI.
+ * It's called to do all the basic tasks with PDF files.
+*/
+
 import { PdfViewer, DocumentFilters, DocumentProcessor } from './pdf';
 import DocumentCutter from './DocumentCutter';
 
@@ -6,14 +11,17 @@ export default class Executor {
   documentFilters: DocumentFilters;
   filteredPages: Array<Array<number>>;
 
+  /**
+  * Provide a reference to the documents with defined filters
+  */
   constructor(files: File[], documentFilters: DocumentFilters) {
     this.files = files;
     this.documentFilters = documentFilters;
   }
 
-  private async getFilteredPages() {
-    const x = new DocumentProcessor(this.files);
-    return x.tranformFilteredPagesToIndexes(await x.getFilteredPages(this.documentFilters));
+  private async getFilteredPages(): Promise<number[][]> {
+    const documentProcessor = new DocumentProcessor(this.files);
+    return documentProcessor.tranformFilteredPagesToIndexes(await documentProcessor.getFilteredPages(this.documentFilters));
   }
 
   public async renderDocuments(): Promise<void> {
@@ -32,7 +40,8 @@ export default class Executor {
     }
   }
 
-  async getPageCount(): Promise<Array<number>> {
+  /* Function that returns the final counts of pages of all documents */
+  public async getPageCount(): Promise<number[]> {
     const pdfViewerObj = new PdfViewer(this.files);
     await pdfViewerObj.prepareForRender();
     const pageCounts = [];
@@ -42,7 +51,5 @@ export default class Executor {
     }
     return pageCounts;
   };
-
-
 }
 
