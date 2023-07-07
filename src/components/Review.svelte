@@ -6,7 +6,6 @@
     Accordion,
     AccordionSection,
     H2,
-    Subhead,
   } from "attractions";
   
   import {Executor as ExecuteProcesses }  from "../core";
@@ -25,7 +24,7 @@
 
   onMount(async () => {
     await executor.renderDocuments();
-    originalPageCount = executor.getOriginalPageCount();
+    originalPageCount = await executor.getOriginalPageCount();
     newPageCount = await executor.getPageCount();
   });
 
@@ -36,7 +35,7 @@
 
 <div>
   <Headline>Summary</Headline>
-  <!-- <InfoSummary bind:files bind:originalPageCount bind:newPageCount /> -->
+  <InfoSummary bind:files bind:originalPageCount bind:newPageCount />
 
   <!-- Preview -->
   <Accordion let:closeOtherPanels>
@@ -48,7 +47,7 @@
         </Button>
       </div>
       <Card>
-        <div id="pdf-viewer" />
+        <div class="pdf-viewer" />
       </Card>
     </AccordionSection>
   </Accordion>
