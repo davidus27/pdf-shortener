@@ -44,7 +44,10 @@ export default class PdfViewer {
         // increase the filter by 1 for each page
         const increased_filter = filteredPages.map((pageNumber) => pageNumber + 1);
 
-        for (let page = 1; page <= pdfDocument.numPages; page++) {
+        // always render max 5 pages
+        const maxPageCount = Math.min(5, pdfDocument.numPages);
+
+        for (let page = 1; page <= maxPageCount; page++) {
             // render only pages that are in the filter
             if (increased_filter.includes(page)) {
                 const canvas = document.createElement("canvas");
@@ -57,7 +60,7 @@ export default class PdfViewer {
     }
 
     public async renderAllDocuments(documentFilters: Array<Array<number>>) {
-        const viewer = document.querySelector('pdf-viewer');
+        const viewer = document.querySelector('.pdf-viewer');
         // add class to viewer element
         viewer.className = 'pdf-viewer';
 
@@ -67,6 +70,12 @@ export default class PdfViewer {
         }
 
         for (let fileIndex = 0; fileIndex < this.files.length; fileIndex++) {
+            // add h3 to separate documents in the viewer
+            const documentName = document.createElement("h3");
+            documentName.className = 'pdf-document-name';
+            documentName.innerHTML = `${this.files[fileIndex].name}:`;
+            viewer.appendChild(documentName);
+
             // create new document viewer for each file inside the viewer
             const documentViewer = document.createElement("div");
             documentViewer.className = 'pdf-document-viewer-' + fileIndex;
