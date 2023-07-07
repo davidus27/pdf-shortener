@@ -1,11 +1,10 @@
-<script lang="ts" >
+<script lang="ts">
     export let selected: string;
 </script>
 
-
 <div class="strike">
     <span>
-        <select class="select" bind:value={selected} >
+        <select class="select" bind:value={selected}>
             <option value="AND">AND</option>
             <option value="OR">OR</option>
         </select>
@@ -14,12 +13,12 @@
 
 <style>
     .select {
-        border-radius:36px;
-        display:inline-block;
-        overflow:hidden;
+        border-radius: 36px;
+        display: inline-block;
+        overflow: hidden;
         margin-bottom: 0px;
     }
-    
+
     .strike {
         /* add padding */
         padding-top: 1em;
@@ -28,14 +27,14 @@
         display: block;
         text-align: center;
         overflow: hidden;
-        white-space: nowrap; 
+        white-space: nowrap;
     }
 
     .strike > span {
         position: relative;
         display: inline-block;
     }
-	
+
     .strike > span:before,
     .strike > span:after {
         content: "";
@@ -55,5 +54,4 @@
         left: 100%;
         margin-left: 15px;
     }
-
 </style>

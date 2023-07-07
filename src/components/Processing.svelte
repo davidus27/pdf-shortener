@@ -3,15 +3,14 @@
   import { PdfViewer, DocumentFilters } from "../pdf";
   import Filter from "./Filter.svelte";
 
-
-  export let moveNext: any
+  export let moveNext: any;
   export let files: Array<File>;
   let formData: DocumentFilters;
 
   const handleDocuments = async () => {
     console.log("handleDocuments: ", formData);
     moveNext({
-      "formData": formData,
+      formData: formData,
     });
   };
 
@@ -26,7 +25,6 @@
   getPageCounts().then((counts) => {
     pageCount = counts[0];
   });
-
 </script>
 
 <div>
@@ -37,12 +35,10 @@
   </div>
 </div>
 
-
 <style>
-
   /* move submit-btn to the relative right side of the screen */
   .process-btn {
-    float:right;
+    float: right;
     /* add some padding */
     padding: 20px;
   }

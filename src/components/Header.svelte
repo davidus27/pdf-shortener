@@ -21,17 +21,16 @@
       <ArrowRightIcon slot="separator" size="20" />
     </Breadcrumbs>
   </div>
-  
-  <div class="github-button" >
+
+  <div class="github-button">
     <Button href="https://github.com/davidus27/pdf-shortener">
-      <GithubIcon size="25"/>
+      <GithubIcon size="25" />
     </Button>
   </div>
 </div>
 
 <style>
-
-    /*
+  /*
     navbar will be alligned horizonarally at the same level
     breadcrumbs will be alligned to the left corner
     github button will be alligned to the right corner
@@ -43,8 +42,4 @@
     align-items: center;
     justify-content: space-between;
   }
-
-
-  
-
 </style>

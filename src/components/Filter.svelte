@@ -8,7 +8,7 @@
     Subhead,
     Divider,
     H2,
-    Card
+    Card,
   } from "attractions";
   import type { DocumentFilters } from "../pdf";
   import MyDivider from "./Divider.svelte";
@@ -20,19 +20,19 @@
   export let formData: DocumentFilters = {
     keywords: {
       words: [],
-      logicOperator: "OR"
+      logicOperator: "OR",
     },
     checks: {
       logicOperator: "AND",
-      hasHighlights: false,
+      hasHighlights: true,
       hasImages: false,
       hasLinks: false,
     },
-    textRange: ""
+    textRange: "",
   };
 
-  async function* getOptions(text: string) {
-    yield [
+  function getOptions(text: string) {
+    return [
       { name: text, details: "Optional" },
       { name: `it highlights the match: ${text}` },
     ];
@@ -43,16 +43,22 @@
 
 <div class="filter">
   <Headline>Checkout</Headline>
-  <Subhead style="padding-bottom: 1em;" >New document(s) will only contain pages complying with these rules:</Subhead>
+  <Subhead style="padding-bottom: 1em;"
+    >New document(s) will only contain pages complying with these rules:</Subhead
+  >
 
   <Divider />
   <H2>1. Keywords</H2>
   <div class="keywords-form">
-    <FormField 
+    <FormField
       name="Pages containing specified keywords:"
       help="Enter one or more keywords to search for in the document. The final document will contain pages containing those keywords."
     >
-      <Autocomplete class="pages-contains" {getOptions} bind:selection={formData.keywords.words} />
+      <Autocomplete
+        class="pages-contains"
+        {getOptions}
+        bind:selection={formData.keywords.words}
+      />
     </FormField>
   </div>
 
@@ -63,7 +69,10 @@
     name="Pages containing highlights:"
     help="New document will include pages containing highlighted text"
   >
-    <Switch class="highlight-switch" bind:value={formData.checks.hasHighlights} />
+    <Switch
+      class="highlight-switch"
+      bind:value={formData.checks.hasHighlights}
+    />
   </FormField>
 
   <div class="or"><Subhead>OR...</Subhead></div>
@@ -86,7 +95,6 @@
 
   <MyDivider bind:selected={formData.checks.logicOperator} />
 
-
   <H2>3. Page ranges</H2>
   <PageRange bind:textRange={formData.textRange} bind:pageCount />
 </div>
@@ -106,7 +114,7 @@
     /* add a space at the top */
     padding-top: 2em;
   }
-  
+
   .or {
     padding-bottom: 2em;
   }

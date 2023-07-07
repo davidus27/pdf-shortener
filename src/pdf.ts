@@ -15,7 +15,7 @@ interface DocumentFilters {
     checks: {
         hasLinks: boolean;
         hasHighlights: boolean;
-        hasImages: boolean;    
+        hasImages: boolean;
         logicOperator: "AND" | "OR";
     }
     textRange: string;
@@ -29,13 +29,13 @@ class DocumentConvertor {
 
     public static getDocumentProxy(file: File): Promise<any> {
         const temporaryFileReader = new FileReader();
-    
+
         return new Promise((resolve, reject) => {
-                temporaryFileReader.onerror = function() {
+            temporaryFileReader.onerror = function () {
                 temporaryFileReader.abort();
                 reject(new DOMException("Problem parsing input file."));
             };
-            temporaryFileReader.onload = function() {
+            temporaryFileReader.onload = function () {
                 const typedarray = new Uint8Array(this.result as ArrayBufferLike);
                 const pdfTask = pdfjsLib.getDocument(typedarray);
                 // check if pdfTask is a type Promise<PDFPageProxy>
@@ -47,21 +47,21 @@ class DocumentConvertor {
 
     public static async getDocumentProxies(files: Array<File>) {
 
-        if(!files && !files.length)
+        if (!files && !files.length)
             return;
-    
+
         const pdfTasks = [];
-        for(let fileIndex = 0; fileIndex < files.length; fileIndex++) {
+        for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
             const documentProxy: any = await this.getDocumentProxy(files[fileIndex]);
             // const x = documentProxy.promise;
             pdfTasks.push(await documentProxy.promise);
         }
-    
+
         return pdfTasks;
     }
 
     private async getDocumentAsBuffer(file: File): Promise<ArrayBuffer | string> {
-        return new Promise((resolve, reject): void =>  {
+        return new Promise((resolve, reject): void => {
             const reader = new FileReader();
             reader.onload = () => {
                 if (reader.result) {
@@ -81,7 +81,7 @@ class DocumentConvertor {
 
     public async getPDFDocuments(files: Array<File>): Promise<Array<PDFDocument>> {
         const pdfDocuments = [];
-        for(let fileIndex = 0; fileIndex < files.length; fileIndex++) {
+        for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
             const pdfDocument = await this.getPDFDocument(files[fileIndex]);
             pdfDocuments.push(pdfDocument);
         }
@@ -94,7 +94,7 @@ class DocumentConvertor {
 class DocumentProcessor {
     private documentProxies: Array<pdfjsLib.PDFDocumentProxy>;
     private files: Array<File>;
-    
+
     constructor(files: Array<File>) {
         this.files = files;
     }
@@ -105,9 +105,9 @@ class DocumentProcessor {
 
     private isHighlighted(annotations: Array<any>) {
         // iterate over annotations and check if they match the filter
-        for(let annotationIndex = 0; annotationIndex < annotations.length; annotationIndex++) {
+        for (let annotationIndex = 0; annotationIndex < annotations.length; annotationIndex++) {
             const annotation = annotations[annotationIndex];
-            if(annotation.subtype === 'Highlight') {
+            if (annotation.subtype === 'Highlight') {
                 return true;
             }
         }
@@ -116,9 +116,9 @@ class DocumentProcessor {
 
     private hasLinks(annotations: Array<any>) {
         // iterate over annotations and check if they match the filter
-        for(let annotationIndex = 0; annotationIndex < annotations.length; annotationIndex++) {
+        for (let annotationIndex = 0; annotationIndex < annotations.length; annotationIndex++) {
             const annotation = annotations[annotationIndex];
-            if(annotation.subtype === 'Link' && annotation?.url?.includes('http')) {
+            if (annotation.subtype === 'Link' && annotation?.url?.includes('http')) {
                 return true;
             }
         }
@@ -128,17 +128,17 @@ class DocumentProcessor {
     private async hasImages(pdfPage: pdfjsLib.PDFPageProxy) {
         try {
             const operatorList = await pdfPage.getOperatorList();
-        
+
             const validObjectTypes = [
                 pdfjsLib.OPS.paintImageXObject, // 85
                 pdfjsLib.OPS.paintImageXObjectRepeat, // 88
                 pdfjsLib.OPS.paintJpegXObject //82
             ];
-            
+
             // iterate over operatorList and check if there is an image
-            for(let operatorIndex = 0; operatorIndex < operatorList.fnArray.length; operatorIndex++) {
+            for (let operatorIndex = 0; operatorIndex < operatorList.fnArray.length; operatorIndex++) {
                 const operator = operatorList.fnArray[operatorIndex];
-                if(validObjectTypes.includes(operator)) {
+                if (validObjectTypes.includes(operator)) {
                     // const imageName = operatorList.argsArray[operatorIndex][0];
                     return true;
                 }
@@ -155,12 +155,12 @@ class DocumentProcessor {
     private isInRange(textRange: string, pageIndex: number) {
         const ranges = textRange.split(',');
         // iterate over ranges and check if they match the filter
-        for(let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
+        for (let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
             const range = ranges[rangeIndex];
             const rangeParts = range.split('-');
             const start = parseInt(rangeParts[0]);
             const end = parseInt(rangeParts[1]);
-            if(start <= pageIndex && pageIndex <= end) {
+            if (start <= pageIndex && pageIndex <= end) {
                 return true;
             }
         }
@@ -178,9 +178,9 @@ class DocumentProcessor {
 
         let result = (highlight || links || images);
 
-        if(filters.checks.logicOperator === 'AND') {
+        if (filters.checks.logicOperator === 'AND') {
             result &&= range;
-        } else if(filters.checks.logicOperator === 'OR') {
+        } else if (filters.checks.logicOperator === 'OR') {
             result ||= range;
         }
 
@@ -193,15 +193,15 @@ class DocumentProcessor {
             await this.prepare();
         }
         const filteredPages = [];
-        for(let pdfIndex = 0; pdfIndex < this.documentProxies.length; pdfIndex++) {
+        for (let pdfIndex = 0; pdfIndex < this.documentProxies.length; pdfIndex++) {
             const pdfPageCount = this.documentProxies[pdfIndex].numPages;
-            
+
             // initialize the array of page numbers full of 0
             const pageNumbers = new Array(pdfPageCount).fill(true);
 
-            for(let pageIndex = 1; pageIndex <= pdfPageCount; pageIndex++) {
+            for (let pageIndex = 1; pageIndex <= pdfPageCount; pageIndex++) {
                 const page = await this.documentProxies[pdfIndex].getPage(pageIndex);
-                
+
                 pageNumbers[pageIndex - 1] = await this.calculatePageFilters(page, filters);
 
             }
@@ -213,11 +213,11 @@ class DocumentProcessor {
     public tranformFilteredPagesToIndexes(filteredPages: number[][]): Array<Array<number>> {
         // iterate over filteredPages and transform to indexes
         const filteredIndexes = [];
-        for(let pdfIndex = 0; pdfIndex < filteredPages.length; pdfIndex++) {
+        for (let pdfIndex = 0; pdfIndex < filteredPages.length; pdfIndex++) {
             const pageNumbers = filteredPages[pdfIndex];
             filteredIndexes.push([]);
-            for(let pageIndex = 0; pageIndex < pageNumbers.length; pageIndex++) {
-                if(pageNumbers[pageIndex]) {
+            for (let pageIndex = 0; pageIndex < pageNumbers.length; pageIndex++) {
+                if (pageNumbers[pageIndex]) {
                     filteredIndexes[pdfIndex].push(pageIndex);
                 }
             }
@@ -245,44 +245,59 @@ class PdfViewer {
 
     private renderPage(pdf: any, pageNumber: number, canvas: any) {
         pdf.getPage(pageNumber).then((page: any) => {
-          const viewport = page.getViewport({ scale: this.scale });
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;          
-          page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});
+            const viewport = page.getViewport({ scale: this.scale });
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport });
         });
     }
 
-    public async renderDocument(filteredPages: Array<number>, fileIndex: number) {
-        const viewer = document.getElementById('pdf-viewer');
+    public async renderDocument(viewer: HTMLElement, filteredPages: Array<number>, fileIndex: number) {
+        // const viewer = document.getElementById('pdf-viewer');
         if (!this.pdfDocuments) {
             await this.prepareForRender();
         }
-        
+
         const pdfDocument = this.pdfDocuments[fileIndex];
 
         // remove all children
-        while(viewer?.firstChild) {
+        while (viewer?.firstChild) {
             viewer?.removeChild(viewer?.firstChild);
         }
 
         // increase the filter by 1 for each page
         const increased_filter = filteredPages.map((pageNumber) => pageNumber + 1);
 
-        for(let page = 1; page <= pdfDocument.numPages; page++) {
+        for (let page = 1; page <= pdfDocument.numPages; page++) {
             // render only pages that are in the filter
-            if(increased_filter.includes(page)) {
-                const canvas = document.createElement("canvas");    
+            if (increased_filter.includes(page)) {
+                const canvas = document.createElement("canvas");
                 canvas.className = 'pdf-page-canvas';
                 canvas.setAttribute('style', 'padding: 20px;');
-                viewer.appendChild(canvas);            
+                viewer.appendChild(canvas);
                 this.renderPage(pdfDocument, page, canvas);
             }
         }
     }
 
     public async renderAllDocuments(documentFilters: Array<Array<number>>) {
-        for(let fileIndex = 0; fileIndex < this.files.length; fileIndex++) {
-            await this.renderDocument(documentFilters[fileIndex], fileIndex);
+        const viewer = document.querySelector('pdf-viewer');
+        // add class to viewer element
+        viewer.className = 'pdf-viewer';
+
+        // remove all children
+        while (viewer?.firstChild) {
+            viewer?.removeChild(viewer?.firstChild);
+        }
+
+        for (let fileIndex = 0; fileIndex < this.files.length; fileIndex++) {
+            // create new document viewer for each file inside the viewer
+            const documentViewer = document.createElement("div");
+            documentViewer.className = 'pdf-document-viewer-' + fileIndex;
+            viewer.appendChild(documentViewer);
+
+            // const viewer = document.getElementById('pdf-viewer-' + fileIndex);
+            await this.renderDocument(documentViewer, documentFilters[fileIndex], fileIndex);
         }
     }
 
@@ -302,8 +317,6 @@ class PdfViewer {
         return pageCounts;
     }
 }
-
-
 
 export { PdfViewer, DocumentProcessor };
 export type { DocumentFilters }; 

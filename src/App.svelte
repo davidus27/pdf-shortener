@@ -13,9 +13,8 @@
   let breadcrumbsPath = [{ href: "/", text: "Home" }];
 
   const views = [Starter, Processing, Review];
-  // const views = [Starter, Review];
 
-
+  // breadcrumbs path defined
   const path = [
     { href: "/", text: "Home" },
     { href: "/checkout", text: "Checkout" },
@@ -57,31 +56,12 @@
     updateView(null);
   };
 
-
-
-  const saveAlert = (e: any) => {
-    if (files.length == 0) {
-      return;
-    }
-    if(!e) e = window.event;
-    //e.cancelBubble is supported by IE - this will kill the bubbling process.
-    e.cancelBubble = true;
-    //This is displayed on the dialog box.
-    e.returnValue = 'Are you sure you want to leave? All the progress will be removed'; 
-    //e.stopPropagation works in Firefox.
-    if (e.stopPropagation) {
-        e.stopPropagation();
-        e.preventDefault();
-    }
-  }
-  // window.onbeforeunload = saveAlert; 
   window.onbeforeprint = undefined;
 
   let props = {
     files,
     moveNext,
   };
-
 </script>
 
 <main>
@@ -104,9 +84,7 @@
   <!-- <Footer /> -->
 </main>
 
-
 <style>
-
   main {
     text-align: center;
     padding: 1em;
@@ -115,13 +93,13 @@
   }
 
   /* set viewport to the flexbox */
-  #viewport {
+  /* #viewport {
     height:100vh; 
     margin:0;
     min-height:50px;
     display:flex; 
     flex-direction:column;
-  }
+  } */
 
   /* make buttons horizontally alligned */
   .buttons {

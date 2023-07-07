@@ -30,25 +30,38 @@
                 <div slot="handle" let:toggle>
                     <Button on:click={toggle}>
                         <H2>Summary</H2>&nbsp;
-                        <ChevronDownIcon size="25" class="ml accordion-chevron" />
+                        <ChevronDownIcon
+                            size="25"
+                            class="ml accordion-chevron"
+                        />
                     </Button>
                 </div>
                 {#each files as file}
-                    <Card>
-                        <div class="accordion-text">
-                            <Subhead><b>Document:</b> {file.name}</Subhead>
-                            <Subhead><b>Original No. of pages:</b> {originalPageCount}</Subhead>
-                            <Subhead><b>New No. of pages:</b> {newPageCount}</Subhead>
-                        </div>
-                    </Card>
+                    <div class="summary-cards">
+                        <Card>
+                            <div class="accordion-text">
+                                <Subhead><b>Document:</b> {file.name}</Subhead>
+                                <Subhead>
+                                    <b>Original No. of pages:</b>
+                                    {originalPageCount}
+                                </Subhead>
+                                <Subhead
+                                    ><b>New No. of pages:</b>
+                                    {newPageCount}</Subhead
+                                >
+                            </div>
+                        </Card>
+                    </div>
                 {/each}
             </AccordionSection>
         </Accordion>
     </div>
-    
 </div>
 
-<style> 
+<style>
+    .summary-cards {
+        margin-bottom: 1em;
+    }
     .accordion-text {
         /* align text to the right */
         text-align: left;

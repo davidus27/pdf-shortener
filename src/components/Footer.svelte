@@ -32,17 +32,14 @@
 </script>
 
 <div class="footer">
-
   {#if showButton}
     <div class="scroll-top-btn">
       <Button filled on:click={scrollToTop}>
         <ArrowUpCircleIcon size="25" />&nbsp; scroll to the top
       </Button>
     </div>
-
   {/if}
 
-  
   <Divider text="End of site" />
   <div>
     <H3>This site was made with love ❤️</H3>
@@ -50,10 +47,9 @@
 </div>
 
 <style>
-
   /* set footer div to the responsive end of the page */
   .footer {
-    min-height:50px;
+    min-height: 50px;
     margin-top: auto;
   }
 
@@ -61,5 +57,4 @@
   .scroll-top-btn {
     float: center;
   }
-
 </style>
