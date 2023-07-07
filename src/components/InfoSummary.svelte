@@ -3,16 +3,17 @@
         Button,
         Subhead,
         Divider,
-        H2,
+        H2,H3,
         Card,
         Accordion,
         AccordionSection,
+        Loading,
     } from "attractions";
     import { ChevronDownIcon } from "svelte-feather-icons";
 
     export let files: File[];
-    export let originalPageCount: number;
-    export let newPageCount: number;
+    export let originalPageCount: number[];
+    export let newPageCount: number[];
 </script>
 
 <div>
@@ -36,23 +37,29 @@
                         />
                     </Button>
                 </div>
-                {#each files as file}
-                    <div class="summary-cards">
-                        <Card>
-                            <div class="accordion-text">
-                                <Subhead><b>Document:</b> {file.name}</Subhead>
-                                <Subhead>
-                                    <b>Original No. of pages:</b>
-                                    {originalPageCount}
-                                </Subhead>
-                                <Subhead
-                                    ><b>New No. of pages:</b>
-                                    {newPageCount}</Subhead
-                                >
-                            </div>
-                        </Card>
-                    </div>
-                {/each}
+                {#if !newPageCount || !originalPageCount}
+                    <H3>Loading summary. Please wait...</H3><Loading />
+                {:else}
+                    {#each files as file, index}
+                        <div class="summary-cards">
+                            <Card>
+                                <div class="accordion-text">
+                                    <Subhead
+                                        ><b>Document:</b> {file.name}</Subhead
+                                    >
+                                    <Subhead>
+                                        <b>Original No. of pages:</b>
+                                        {originalPageCount[index]}
+                                    </Subhead>
+                                    <Subhead
+                                        ><b>New No. of pages:</b>
+                                        {newPageCount[index]}</Subhead
+                                    >
+                                </div>
+                            </Card>
+                        </div>
+                    {/each}
+                {/if}
             </AccordionSection>
         </Accordion>
     </div>
