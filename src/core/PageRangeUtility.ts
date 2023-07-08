@@ -16,45 +16,6 @@
  * 
  */
 export default class PageRangeUtility {
-    // public textRange: string;
-    // public ranges: [number, number][];
-    // pageCount: number;
-
-    // constructor(textRange: string, pageCount: number) {
-    //     pageCount = pageCount;
-    //     textRange = textRange;
-    //     ranges = [];
-    // }
-
-    // setPageCount(pageCount: number) {
-    //     pageCount = pageCount;
-    //     ranges = updateRanges();
-    //     textRange = updateTextRange();
-    // }
-
-    // setTextRange(textRange: string) {
-    //     textRange = textRange;
-    //     ranges = updateRanges();
-    // }
-
-    // setRanges(ranges: [number, number][]) {
-    //     ranges = ranges;
-    //     textRange = updateTextRange();
-    // }
-
-    // addRange(start: number, end: number) {
-    //     ranges.push([start, end]);
-    //     textRange = updateTextRange();
-    // }
-
-    // getRanges(): [number, number][] {
-    //     return ranges;
-    // }
-
-    // getTextRange(): string {
-    //     return textRange;
-    // }
-
 
     textRangeIsCorrect(textRange: string, pageCount: number): boolean {
         // ignore the testing when empty
@@ -103,11 +64,6 @@ export default class PageRangeUtility {
             if (firstNumber < 1 || secondNumber > pageCount) {
                 return false;
             }
-
-            // I think we can ignore this one
-            // if (firstNumber === secondNumber) {
-            //   return false;
-            // }
         }
         return true;
     };
@@ -130,12 +86,15 @@ export default class PageRangeUtility {
             }
         }
         // remove last comma
-        return textRange.slice(0, -1);
+        return textRange.slice(0, -1).replace(" ", "");
     };
 
     // function that updates array ranges from text range
     updateRanges(textRange: string, pageCount: number) {
         if(!this.textRangeIsCorrect(textRange, pageCount)) return null;
+
+        // remove all spaces
+        textRange = textRange.replace(" ", "");
 
         // separate the ranges
         const ranges = textRange.split(",");

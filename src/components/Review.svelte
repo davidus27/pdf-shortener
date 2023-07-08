@@ -9,26 +9,23 @@
   } from "attractions";
   import { ChevronDownIcon } from "svelte-feather-icons";
   import { onMount } from "svelte";
-  import InfoSummary from "./InfoSummary.svelte";
+  import InfoSummary from "./general/InfoSummary.svelte";
   import { formData } from "../stores/filterStore";
   import { Executor as ExecuteProcesses } from "../core";
 
-  import { files } from "../stores/filesStore";
-
-  // export let moveNext: () => void;
-
-  // export let files: Array<File>;
-
-  let originalPageCount: number[];
-  let newPageCount: number[];
+  import {
+    files,
+    originalPageCounts,
+    filteredPageCounts,
+  } from "../stores/filesStore";
 
   let executor: ExecuteProcesses;
 
   onMount(async () => {
+    // this starts the process of filtering the files
     executor = new ExecuteProcesses($files, $formData);
     await executor.renderDocuments();
-    originalPageCount = await executor.getOriginalPageCount();
-    newPageCount = await executor.getPageCount();
+    filteredPageCounts.set(await executor.getPageCount());
   });
 
   const handleDownload = async () => {
@@ -38,7 +35,11 @@
 
 <div>
   <Headline>Summary</Headline>
-  <InfoSummary bind:files={$files} bind:originalPageCount bind:newPageCount />
+  <InfoSummary
+    bind:files={$files}
+    bind:originalPageCount={$originalPageCounts}
+    bind:newPageCount={$filteredPageCounts}
+  />
 
   <!-- Preview -->
   <Accordion let:closeOtherPanels>

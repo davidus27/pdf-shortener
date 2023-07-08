@@ -5,6 +5,7 @@
   import { onMount } from "svelte";
   import { files, originalPageCounts } from "../stores/filesStore";
 
+  import { formData } from "../stores/filterStore";
   export let moveNext: any;
 
   onMount(async () => {
@@ -22,7 +23,10 @@
   <Filter />
 
   <div class="process-btn">
-    <Button danger filled on:click={moveNext}>Process</Button>
+    <Button danger filled on:click={() => {
+      console.log($formData)
+      moveNext();
+    }}>Process</Button>
   </div>
 </div>
 

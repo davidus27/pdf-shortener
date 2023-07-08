@@ -8,16 +8,15 @@
     Divider,
     H2,
   } from "attractions";
-  import MyDivider from "./Divider.svelte";
-  import PageRange from "./PageRange.svelte";
+  import MyDivider from "./general/Divider.svelte";
+  import PageRange from "./general/PageRange.svelte";
 
   import { formData } from "../stores/filterStore";
   import { originalPageCounts } from "../stores/filesStore";
 
-  function getOptions(text: string) {
-    return [
-      { name: text, details: "Optional" },
-      { name: `it highlights the match: ${text}` },
+  function* getOptions(text: string) {
+    yield [
+      { name: text, details: `You are looking for ${text}` },
     ];
   }
 

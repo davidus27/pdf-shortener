@@ -8,7 +8,7 @@
     Loading,
   } from "attractions";
   import { PlusIcon } from "svelte-feather-icons";
-  import { PageRangeUtility } from "../core";
+  import { PageRangeUtility } from "../../core";
 
   export let pageCount: number;
   

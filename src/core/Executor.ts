@@ -44,10 +44,6 @@ export default class Executor {
     }
   }
 
-  public async getOriginalPageCount(): Promise<number[]> {
-    return [1, 2];
-  }
-
   /* Function that returns the final counts of pages of all documents */
   public async getPageCount(): Promise<number[]> {
     const pdfViewerObj = new PdfViewer(this.files);

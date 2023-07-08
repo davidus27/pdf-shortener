@@ -6,7 +6,7 @@
     Subhead,
   } from "attractions";
   import { SnackbarPositions } from "attractions/snackbar";
-  import Info from "./Info.svelte";
+  import Info from "./general/Info.svelte";
   import { files } from "../stores/filesStore";
 
   // export let files = [];

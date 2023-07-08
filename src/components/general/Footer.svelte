@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Button, Dialog, Divider, H3, Label } from "attractions";
-  import { AlertTriangleIcon, ArrowUpCircleIcon } from "svelte-feather-icons";
+  import { Button, Divider, H3, Label } from "attractions";
+  import { ArrowUpCircleIcon } from "svelte-feather-icons";
 
   let showButton = false;
 
@@ -31,7 +31,7 @@
   };
 </script>
 
-<div class="footer">
+<footer class="footer">
   {#if showButton}
     <div class="scroll-top-btn">
       <Button filled on:click={scrollToTop}>
@@ -42,16 +42,18 @@
 
   <Divider text="End of site" />
   <div>
-    <H3>This site was made with love ❤️</H3>
+    <Label small>This site was made with love ❤️</Label>
   </div>
-</div>
-
+</footer>
 
 <style>
   /* set footer div to the responsive end of the page */
   .footer {
     min-height: 50px;
     margin-top: auto;
+    /* make this ALWAYS be on the bottom of the physical screen */
+    padding: 20px;
+    text-align: center;
   }
 
   /* center scroll-top-btn to the center dynamically */
