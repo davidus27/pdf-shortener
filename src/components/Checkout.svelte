@@ -14,6 +14,7 @@
     originalPageCounts.update((): number[] => {
       return pdfViewerObj.getPageCounts();
     });
+
   });
 </script>
 

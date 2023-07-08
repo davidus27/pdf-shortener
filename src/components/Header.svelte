@@ -23,7 +23,10 @@
   </div>
 
   <div class="github-button">
-    <Button href="https://github.com/davidus27/pdf-shortener">
+    <Button
+      href="https://github.com/davidus27/pdf-shortener"
+      aria-label="Github link to the original project"
+    >
       <GithubIcon size="25" />
     </Button>
   </div>

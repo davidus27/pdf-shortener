@@ -8,22 +8,23 @@
     Loading,
   } from "attractions";
   import { PlusIcon } from "svelte-feather-icons";
-  import { PageRange } from "../core";
+  import { PageRangeUtility } from "../core";
 
-  const pageRange = new PageRange();
   export let pageCount: number;
+  
+  export let textRange: string;
+  let ranges: [number, number][] = [];
 
-  let ranges = [];
-  export let textRange = "";
+  let pager = new PageRangeUtility(); 
 
 </script>
 
 <div class="textfield">
   <FormField
-    name="Page ranges:"
-    help="Enter page ranges separated by commas. Or use interactive slider by selecting 'Add new range'."
+    name="Page pageRanges:"
+    help="Enter page pageRanges separated by commas. Or use interactive slider by selecting 'Add new range'."
     errors={[
-      !pageRange.textRangeIsCorrect(textRange, pageCount) &&
+      !pager.textRangeIsCorrect(textRange, pageCount) &&
         "Range in not in a correct format. Note: It can't exceed the boundaries of the page. Ex. 1-3,5,7-10",
     ]}
   >
@@ -31,45 +32,40 @@
       class="page-range-input"
       placeholder="e.g. 1-5,8,11-13"
       bind:value={textRange}
-      on:change={(e) => {
-        console.log(ranges);
-        textRange = e.target.value;
-        ranges = pageRange.updateRanges();
+      on:change={(event) => {
+        if(pager.textRangeIsCorrect(event.detail.value, pageCount)) {
+          ranges = pager.updateRanges(event.detail.value, pageCount);
+        }
       }}
     />
 
     <!-- if the pageCount is not ready yet show a loading component -->
     {#if pageCount}
-      {#each ranges as range}
+      {#each ranges as pageRange}
         <div class="range">
           <div class="label">
             <Label>
-              {#if range.start == range.end}
-                {range.start}
-              {:else if range.start > range.end}
-                {range.end}-{range.start}
+              {#if pageRange[0] == pageRange[1]}
+                {pageRange[0]}
+              {:else if pageRange[0] > pageRange[1]}
+                {pageRange[1]}-{pageRange[0]}
               {:else}
-                {range.start}-{range.end}
+                {pageRange[0]}-{pageRange[1]}
               {/if}
             </Label>
           </div>
-          <!-- value={[range.start, range.end]} -->
           <Slider
             min={1}
             max={pageCount}
             step={1}
             tooltips="active"
-            ticks={{ mode: "values", values: pageRange.generateRange(pageCount), subDensity: 0 }}
+            ticks={{ mode: "values", values: pager.generateRange(pageCount), subDensity: 0 }}
             rangeBehavior="free"
-            bind:value={range}
+            bind:value={pageRange}
             on:change={(e) => {
-              console.log("changed:", pageCount);
-
-              range = {
-                start: e.detail[0],
-                end: e.detail[1],
-              };
-              textRange = pageRange.updateTextRange();
+              pageRange = [e.detail[0], e.detail[1]];
+              ranges = ranges;
+              textRange = pager.updateTextRange(ranges);
             }}
           />
         </div>
@@ -78,22 +74,19 @@
       <div class="add-btn">
         <Button
           on:click={() => {
-            ranges.push({
-              start: 1,
-              end: pageCount,
-            });
-            textRange = pageRange.updateTextRange();
+            ranges.push([1, pageCount]);
             ranges = ranges;
+            textRange = pager.updateTextRange(ranges);
           }}
         >
-          Add new range &nbsp;
+          Add new page range &nbsp;
           <PlusIcon size="25" />
         </Button>
       </div>
     {:else}
       <div class="loading-bar">
         <Loading />
-        <Label>&nbsp;&nbsp; Loading page ranges, please wait...</Label>
+        <Label>&nbsp;&nbsp; Loading page range, please wait...</Label>
       </div>
     {/if}
   </FormField>

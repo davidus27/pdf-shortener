@@ -65,6 +65,7 @@
   >
   <SnackbarContainer let:showSnackbar position={SnackbarPositions.BOTTOM_RIGHT}>
     <FileDropzone
+      aria-label="Drop files here"
       bind:files={$files}
       accept=".pdf"
       max={20}
