@@ -1,11 +1,15 @@
 <script lang="ts">
-  import { SnackbarContainer, FileDropzone, Button, Headline, Subhead } from "attractions";
+  import {
+    SnackbarContainer,
+    FileDropzone,
+    Button,
+    Subhead,
+  } from "attractions";
   import { SnackbarPositions } from "attractions/snackbar";
-import Info from "./Info.svelte";
-import Warning from "./Warning.svelte";
+  import Info from "./Info.svelte";
+  import { files } from "../stores/filesStore";
 
-
-  export let files = [];
+  // export let files = [];
   export let moveNext: () => void;
   let insertionText: string;
 
@@ -29,27 +33,39 @@ import Warning from "./Warning.svelte";
     // });
     setIsInsertion("+");
   };
-  
 
   const setIsInsertion = (warn: string) => {
     // Not ideal solution but it mostly works
     insertionText = warn;
     const tmpValue = insertionText;
-    setTimeout(() => {
-      if (tmpValue === insertionText) {
-        insertionText = "";
-      }
-    }, 2500, tmpValue);
+    setTimeout(
+      () => {
+        if (tmpValue === insertionText) {
+          insertionText = "";
+        }
+      },
+      2500,
+      tmpValue
+    );
   };
-</script>
 
+  const handleSubmit = () => {
+    // update store
+
+    // move to the next page
+    moveNext();
+  }
+
+</script>
 
 <div class="starter">
   <h1>pdf shortener</h1>
-  <Subhead>If you want to shorten your document(s), please insert them down bellow</Subhead>
+  <Subhead
+    >If you want to shorten your document(s), please insert them down bellow</Subhead
+  >
   <SnackbarContainer let:showSnackbar position={SnackbarPositions.BOTTOM_RIGHT}>
     <FileDropzone
-      bind:files
+      bind:files={$files}
       accept=".pdf"
       max={20}
       on:change={(e) => handleChange(e, showSnackbar)}
@@ -58,18 +74,15 @@ import Warning from "./Warning.svelte";
 
   <div class="submit-btn">
     <Button
-      disabled={!files.length}
+      disabled={!$files.length}
       filled
-      on:click={() => {
-        moveNext();
-      }}>Submit</Button
+      on:click={handleSubmit}>Submit</Button
     >
   </div>
 
-  {#if insertionText }
+  {#if insertionText}
     <Info bind:insertionText />
   {/if}
-
 </div>
 
 <style>
@@ -93,11 +106,8 @@ import Warning from "./Warning.svelte";
 
   /* move submit-btn to the relative right side of the screen */
   .submit-btn {
-    float:right;
+    float: right;
     /* add some padding */
     padding: 20px;
-
   }
-
-
 </style>
