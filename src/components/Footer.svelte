@@ -46,6 +46,7 @@
   </div>
 </div>
 
+
 <style>
   /* set footer div to the responsive end of the page */
   .footer {

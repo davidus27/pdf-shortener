@@ -1,6 +1,5 @@
 <script lang="ts">
   import {
-    Button,
     FormField,
     Switch,
     Autocomplete,
@@ -8,28 +7,12 @@
     Subhead,
     Divider,
     H2,
-    Card,
   } from "attractions";
-  import type { DocumentFilters } from "../core/PDFLogic";
+  // import type { DocumentFilters } from "../core";
   import MyDivider from "./Divider.svelte";
-
   import PageRange from "./PageRange.svelte";
 
-  import { PlusIcon } from "svelte-feather-icons";
-
-  export let formData: DocumentFilters = {
-    keywords: {
-      words: [],
-      logicOperator: "OR",
-    },
-    checks: {
-      logicOperator: "AND",
-      hasHighlights: true,
-      hasImages: false,
-      hasLinks: false,
-    },
-    textRange: "",
-  };
+  import { formData } from "../stores/filterStore";
 
   function getOptions(text: string) {
     return [
@@ -46,8 +29,9 @@
   <Subhead style="padding-bottom: 1em;"
     >New document(s) will only contain pages complying with these rules:</Subhead
   >
-
   <Divider />
+
+  <!-- First filter -->
   <H2>1. Keywords</H2>
   <div class="keywords-form">
     <FormField
@@ -57,12 +41,14 @@
       <Autocomplete
         class="pages-contains"
         {getOptions}
-        bind:selection={formData.keywords.words}
+        bind:selection={$formData.keywords.words}
       />
     </FormField>
   </div>
 
-  <MyDivider bind:selected={formData.keywords.logicOperator} />
+  <MyDivider bind:selected={$formData.keywords.logicOperator} />
+
+  <!-- Second filters -->
   <H2 style="padding-bottom: 2em">2. Checks</H2>
 
   <FormField
@@ -71,7 +57,7 @@
   >
     <Switch
       class="highlight-switch"
-      bind:value={formData.checks.hasHighlights}
+      bind:value={$formData.checks.hasHighlights}
     />
   </FormField>
 
@@ -81,7 +67,7 @@
     name="Pages containing links:"
     help="New document will include pages containing links."
   >
-    <Switch class="links-switch" bind:value={formData.checks.hasLinks} />
+    <Switch class="links-switch" bind:value={$formData.checks.hasLinks} />
   </FormField>
 
   <div class="or"><Subhead>OR...</Subhead></div>
@@ -90,13 +76,14 @@
     name="Pages containing images:"
     help="New document will include pages containing images."
   >
-    <Switch class="images-switch" bind:value={formData.checks.hasImages} />
+    <Switch class="images-switch" bind:value={$formData.checks.hasImages} />
   </FormField>
 
-  <MyDivider bind:selected={formData.checks.logicOperator} />
+  <MyDivider bind:selected={$formData.checks.logicOperator} />
 
+  <!-- Third filter -->
   <H2>3. Page ranges</H2>
-  <PageRange bind:textRange={formData.textRange} bind:pageCount />
+  <PageRange bind:textRange={$formData.textRange} bind:pageCount />
 </div>
 
 <style>

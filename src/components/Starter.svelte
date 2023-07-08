@@ -3,14 +3,13 @@
     SnackbarContainer,
     FileDropzone,
     Button,
-    Headline,
     Subhead,
   } from "attractions";
   import { SnackbarPositions } from "attractions/snackbar";
   import Info from "./Info.svelte";
-  import Warning from "./Warning.svelte";
+  import { files } from "../stores/filesStore";
 
-  export let files = [];
+  // export let files = [];
   export let moveNext: () => void;
   let insertionText: string;
 
@@ -49,6 +48,14 @@
       tmpValue
     );
   };
+
+  const handleSubmit = () => {
+    // update store
+
+    // move to the next page
+    moveNext();
+  }
+
 </script>
 
 <div class="starter">
@@ -58,7 +65,7 @@
   >
   <SnackbarContainer let:showSnackbar position={SnackbarPositions.BOTTOM_RIGHT}>
     <FileDropzone
-      bind:files
+      bind:files={$files}
       accept=".pdf"
       max={20}
       on:change={(e) => handleChange(e, showSnackbar)}
@@ -67,11 +74,9 @@
 
   <div class="submit-btn">
     <Button
-      disabled={!files.length}
+      disabled={!$files.length}
       filled
-      on:click={() => {
-        moveNext();
-      }}>Submit</Button
+      on:click={handleSubmit}>Submit</Button
     >
   </div>
 

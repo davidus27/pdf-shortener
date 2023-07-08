@@ -3,13 +3,11 @@
   import { Button } from "attractions";
   import { ArrowLeftIcon, XIcon } from "svelte-feather-icons";
 
-  import Footer from "./components/Footer.svelte";
   import Header from "./components/Header.svelte";
   import Checkout from "./components/Checkout.svelte";
   import Starter from "./components/Starter.svelte";
   import Review from "./components/Review.svelte";
 
-  let files = [];
   let breadcrumbsPath = [{ href: "/", text: "Home" }];
 
   const views = [Starter, Checkout, Review];
@@ -59,7 +57,7 @@
   window.onbeforeprint = undefined;
 
   let props = {
-    files,
+    // files,
     moveNext,
   };
 </script>

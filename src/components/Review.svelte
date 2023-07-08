@@ -7,22 +7,25 @@
     AccordionSection,
     H2,
   } from "attractions";
-  
-  import {Executor as ExecuteProcesses }  from "../core";
-
   import { ChevronDownIcon } from "svelte-feather-icons";
   import { onMount } from "svelte";
   import InfoSummary from "./InfoSummary.svelte";
+  import { formData } from "../stores/filterStore";
+  import { Executor as ExecuteProcesses } from "../core";
 
-  export let files: Array<File>;
-  export let formData: any;
+  import { files } from "../stores/filesStore";
+
+  // export let moveNext: () => void;
+
+  // export let files: Array<File>;
 
   let originalPageCount: number[];
   let newPageCount: number[];
 
-  let executor = new ExecuteProcesses(files, formData);
+  let executor: ExecuteProcesses;
 
   onMount(async () => {
+    executor = new ExecuteProcesses($files, $formData);
     await executor.renderDocuments();
     originalPageCount = await executor.getOriginalPageCount();
     newPageCount = await executor.getPageCount();
@@ -35,7 +38,7 @@
 
 <div>
   <Headline>Summary</Headline>
-  <InfoSummary bind:files bind:originalPageCount bind:newPageCount />
+  <InfoSummary bind:files={$files} bind:originalPageCount bind:newPageCount />
 
   <!-- Preview -->
   <Accordion let:closeOtherPanels>
@@ -51,10 +54,6 @@
       </Card>
     </AccordionSection>
   </Accordion>
-  <!-- <div id='pdf-viewer'></div> -->
-  <!-- <Card id='pdf-viewer'>
-    <div id='pdf-viewer'></div>
-  </Card> -->
 
   <div class="process-btn">
     <Button danger filled on:click={handleDownload}>Download</Button>

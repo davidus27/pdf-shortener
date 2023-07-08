@@ -45,7 +45,7 @@ export default class Executor {
   }
 
   public async getOriginalPageCount(): Promise<number[]> {
-    return [1];
+    return [1, 2];
   }
 
   /* Function that returns the final counts of pages of all documents */
