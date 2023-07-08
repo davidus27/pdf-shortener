@@ -5,7 +5,7 @@ import DocumentProcessor from "./DocumentProcessor";
 import type { DocumentFilters } from "./DocumentProcessor";
 import Executor from "./Executor";
 import PdfViewer from "./PdfViewer";
-
+import PageRange from "./PageRange";
 
 import * as pdfjsLib from 'pdfjs-dist';
 
@@ -20,6 +20,7 @@ export {
     DocumentCutter,
     DocumentProcessor,
     DocumentFilters,
+    PageRange,
     Executor,
     PdfViewer,
 };
