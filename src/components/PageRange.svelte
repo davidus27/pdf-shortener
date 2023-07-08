@@ -11,12 +11,10 @@
   import { PageRange } from "../core";
 
   const pageRange = new PageRange();
-
   export let pageCount: number;
 
   let ranges = [];
   export let textRange = "";
-
 
 </script>
 
@@ -61,16 +59,16 @@
             max={pageCount}
             step={1}
             tooltips="active"
-            ticks={{ mode: "values", values: pageRange.generateRange(), subDensity: 0 }}
+            ticks={{ mode: "values", values: pageRange.generateRange(pageCount), subDensity: 0 }}
             rangeBehavior="free"
             bind:value={range}
             on:change={(e) => {
               console.log("changed:", pageCount);
 
-              // range = {
-              //   start: e.detail[0],
-              //   end: e.detail[1],
-              // };
+              range = {
+                start: e.detail[0],
+                end: e.detail[1],
+              };
               textRange = pageRange.updateTextRange();
             }}
           />
@@ -85,7 +83,7 @@
               end: pageCount,
             });
             textRange = pageRange.updateTextRange();
-            // ranges = ranges;
+            ranges = ranges;
           }}
         >
           Add new range &nbsp;

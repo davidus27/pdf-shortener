@@ -1,37 +1,27 @@
 <script lang="ts">
   import { Button } from "attractions";
-  import { PdfViewer, DocumentFilters } from "../core";
+  import { PdfViewer } from "../core";
   import Filter from "./Filter.svelte";
-  import { formData } from "../stores/filterStore";
-  import { files } from "../stores/filesStore";
+  import { onMount } from "svelte";
+  import { files, originalPageCounts } from "../stores/filesStore";
 
   export let moveNext: any;
-  // export let files: Array<File>;
-  // let formData: DocumentFilters;
 
-  const handleDocuments = async () => {
-    console.log("handleDocuments: ", $formData);
-    moveNext();
-  };
-
-  let pageCount: number;
-  // get pages count from pdf
-  const getPageCounts = async () => {
+  onMount(async () => {
     const pdfViewerObj = new PdfViewer($files);
     await pdfViewerObj.prepareForRender();
-    return pdfViewerObj.getPageCounts();
-  };
 
-  getPageCounts().then((counts) => {
-    pageCount = counts[0];
+    originalPageCounts.update((): number[] => {
+      return pdfViewerObj.getPageCounts();
+    });
   });
 </script>
 
 <div>
-  <Filter bind:pageCount />
+  <Filter />
 
   <div class="process-btn">
-    <Button danger filled on:click={handleDocuments}>Process</Button>
+    <Button danger filled on:click={moveNext}>Process</Button>
   </div>
 </div>
 

@@ -8,11 +8,11 @@
     Divider,
     H2,
   } from "attractions";
-  // import type { DocumentFilters } from "../core";
   import MyDivider from "./Divider.svelte";
   import PageRange from "./PageRange.svelte";
 
   import { formData } from "../stores/filterStore";
+  import { originalPageCounts } from "../stores/filesStore";
 
   function getOptions(text: string) {
     return [
@@ -21,7 +21,15 @@
     ];
   }
 
-  export let pageCount: number;
+  /** 
+   * TODO: currently the filter is applied on all files in the list same way
+   * in future we may want to apply different filters on different files
+   * so we need to change the filterStore to be an array of filters
+   * this would be a pageCounts. Now we select page count of longest document
+  */
+  $: pageCount = Math.max(...$originalPageCounts);
+
+  // export let pageCount: number;
 </script>
 
 <div class="filter">
