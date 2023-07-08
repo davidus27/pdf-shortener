@@ -92,7 +92,10 @@ export default class PageRangeUtility {
     // function that updates array ranges from text range
     updateRanges(textRange: string, pageCount: number) {
         if(!this.textRangeIsCorrect(textRange, pageCount)) return null;
-
+        
+        // remove all ranges when text is deleted
+        if (textRange.length === 0) return [];
+        
         // remove all spaces
         textRange = textRange.replace(" ", "");
 
