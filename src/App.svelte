@@ -76,7 +76,7 @@
     <div id="viewport" on:outroend={updateView} transition:fade>
       {#if currentView > 0}
         <div class="buttons">
-          <Button on:click={movePrevious} round small>
+          <Button on:click={() => movePrevious()} round small>
             <ArrowLeftIcon size="20" />
           </Button>
           <Button on:click={reset} round small>

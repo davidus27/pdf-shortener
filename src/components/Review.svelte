@@ -22,6 +22,7 @@
   let executor: ExecuteProcesses;
 
   onMount(async () => {
+    console.log("formData", $formData);
     // this starts the process of filtering the files
     executor = new ExecuteProcesses($files, $formData);
     await executor.renderDocuments();
