@@ -6,7 +6,7 @@
     Subhead,
   } from "attractions";
   import { SnackbarPositions } from "attractions/snackbar";
-  import Info from "./Info.svelte";
+  import Info from "./general/Info.svelte";
   import { files } from "../stores/filesStore";
 
   // export let files = [];
@@ -65,6 +65,7 @@
   >
   <SnackbarContainer let:showSnackbar position={SnackbarPositions.BOTTOM_RIGHT}>
     <FileDropzone
+      aria-label="Drop files here"
       bind:files={$files}
       accept=".pdf"
       max={20}

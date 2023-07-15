@@ -3,7 +3,8 @@
   import { Button } from "attractions";
   import { ArrowLeftIcon, XIcon } from "svelte-feather-icons";
 
-  import Header from "./components/Header.svelte";
+  import Header from "./components/general/Header.svelte";
+  import Footer from "./components/general/Footer.svelte";
   import Checkout from "./components/Checkout.svelte";
   import Starter from "./components/Starter.svelte";
   import Review from "./components/Review.svelte";
@@ -29,6 +30,12 @@
       props = { ...props, ...newProps };
     }
     breadcrumbsPath = path.slice(0, currentView + 1);
+
+    // scroll to the top of the page
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const moveNext = (newProps = null) => {
@@ -63,23 +70,24 @@
 </script>
 
 <main>
-  <Header bind:items={breadcrumbsPath} />
+  <div class="content">
+    <Header bind:items={breadcrumbsPath} />
 
-  <div id="viewport" on:outroend={updateView} transition:fade>
-    {#if currentView > 0}
-      <div class="buttons">
-        <Button on:click={movePrevious} round small>
-          <ArrowLeftIcon size="20" />
-        </Button>
-        <Button on:click={reset} round small>
-          <XIcon size="20" />
-        </Button>
-      </div>
-    {/if}
-    <svelte:component this={viewComponent} {...props} />
+    <div id="viewport" on:outroend={updateView} transition:fade>
+      {#if currentView > 0}
+        <div class="buttons">
+          <Button on:click={() => movePrevious()} round small>
+            <ArrowLeftIcon size="20" />
+          </Button>
+          <Button on:click={reset} round small>
+            <XIcon size="20" />
+          </Button>
+        </div>
+      {/if}
+      <svelte:component this={viewComponent} {...props} />
+    </div>
   </div>
-
-  <!-- <Footer /> -->
+  <Footer />
 </main>
 
 <style>
@@ -88,6 +96,12 @@
     padding: 1em;
     max-width: 240px;
     margin: 0 auto;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
   }
 
   /* set viewport to the flexbox */

@@ -8,20 +8,30 @@
     Divider,
     H2,
   } from "attractions";
-  // import type { DocumentFilters } from "../core";
-  import MyDivider from "./Divider.svelte";
-  import PageRange from "./PageRange.svelte";
+  import MyDivider from "./general/Divider.svelte";
+  import PageRange from "./general/PageRange.svelte";
 
   import { formData } from "../stores/filterStore";
+  import { originalPageCounts } from "../stores/filesStore";
 
-  function getOptions(text: string) {
-    return [
-      { name: text, details: "Optional" },
-      { name: `it highlights the match: ${text}` },
-    ];
+  function* getOptions(text: string) {
+    yield [{ name: text, details: `You are looking for ${text}` }];
   }
 
-  export let pageCount: number;
+  let selection: { name: string }[] = [];
+
+  /**
+   * TODO: currently the filter is applied on all files in the list same way
+   * in future we may want to apply different filters on different files
+   * so we need to change the filterStore to be an array of filters
+   * this would be a pageCounts. Now we select page count of longest document
+   */
+  $: pageCount = Math.max(...$originalPageCounts);
+  $: $formData.keywords.words = selection.map((value: { name: string }) => {
+    return value.name;
+  });
+
+  // export let pageCount: number;
 </script>
 
 <div class="filter">
@@ -41,7 +51,7 @@
       <Autocomplete
         class="pages-contains"
         {getOptions}
-        bind:selection={$formData.keywords.words}
+        bind:selection
       />
     </FormField>
   </div>

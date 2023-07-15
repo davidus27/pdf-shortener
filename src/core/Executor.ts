@@ -3,7 +3,6 @@
  * It's called to do all the basic tasks with PDF files.
 */
 
-// import { PdfViewer, DocumentFilters, DocumentProcessor } from './PDFLogic';
 import PdfViewer from './PdfViewer';
 import type { DocumentFilters } from './DocumentProcessor';
 import DocumentProcessor from './DocumentProcessor';
@@ -25,7 +24,8 @@ export default class Executor {
 
   private async getFilteredPages(): Promise<number[][]> {
     const documentProcessor = new DocumentProcessor(this.files);
-    return documentProcessor.tranformFilteredPagesToIndexes(await documentProcessor.getFilteredPages(this.documentFilters));
+    const filteredPages = await documentProcessor.getFilteredPages(this.documentFilters);
+    return documentProcessor.tranformFilteredPagesToIndexes(filteredPages);
   }
 
   public async renderDocuments(): Promise<void> {
@@ -42,10 +42,6 @@ export default class Executor {
       const name = this.files[fileIndex].name.slice(0, -4);
       await dc.processDocument(filteredPages[fileIndex], `${name}_new_version_${fileIndex + 1}.pdf`);
     }
-  }
-
-  public async getOriginalPageCount(): Promise<number[]> {
-    return [1, 2];
   }
 
   /* Function that returns the final counts of pages of all documents */

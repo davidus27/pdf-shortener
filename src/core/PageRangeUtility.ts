@@ -1,22 +1,30 @@
-export interface RangeType {
-    start: number;
-    end: number;
-}
-
-export default class PageRange {
-    textRange: string;
-    ranges: RangeType[];
-
-    constructor() {
-        this.textRange = "";
-        this.ranges = [];
-    }
+/**
+ * PageRangeUtility class
+ * This class is responsible for handling consistency 
+ * of page ranges in the text field and array of objects.
+ * 
+ * @param pageCount - number of pages in the document
+ * @param textRange - string that represents page ranges in the text field
+ * @param ranges - array of objects that represents page ranges
+ * 
+ * @function setPageCount() - sets the number of pages in the document
+ * @function setTextRange() - sets the text range
+ * @function setRanges() - sets the array of objects
+ * @function getRanges() - returns the array of objects
+ * @function getTextRange() - returns the text range
+ * @function textRangeIsCorrect() - checks if the text range is correct
+ * 
+ */
+export default class PageRangeUtility {
 
     textRangeIsCorrect(textRange: string, pageCount: number): boolean {
         // ignore the testing when empty
         if (textRange.length === 0) {
             return true;
         }
+
+        // remove all spaces
+        textRange = textRange.replace(" ", "");
 
         // check for correct format:
         // {number}-{number}, {number}, {number}-{number},
@@ -56,40 +64,43 @@ export default class PageRange {
             if (firstNumber < 1 || secondNumber > pageCount) {
                 return false;
             }
-
-            // I think we can ignore this one
-            // if (firstNumber === secondNumber) {
-            //   return false;
-            // }
         }
         return true;
     };
 
-    // function that appends text range from slider values
-    updateTextRange() {
+    // function that updates text ranges from array of objects
+    updateTextRange(ranges: [number, number][]) {
         let textRange = "";
 
         // iterate over an range array
-        for (let rangeIndex = 0; rangeIndex < this.ranges.length; rangeIndex++) {
-            let range = this.ranges[rangeIndex];
+        for (let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
+            let range = ranges[rangeIndex];
 
-            if (range.start === range.end) {
-                textRange += `${range.start},`;
-            } else if (range.start > range.end) {
-                range = { start: range.end, end: range.start };
-                textRange += `${range.start}-${range.end},`;
+            if (range[0] === range[1]) {
+                textRange += `${range[0]},`;
+            } else if (range[0] > range[1]) {
+                range = [range[1], range[0]];
+                textRange += `${range[0]}-${range[1]},`;
             } else {
-                textRange += `${range.start}-${range.end},`;
+                textRange += `${range[0]}-${range[1]},`;
             }
         }
         // remove last comma
-        return textRange.slice(0, -1);
+        return textRange.slice(0, -1).replace(" ", "");
     };
 
-    updateRanges() {
-        console.log("updateRanges", this.textRange);
+    // function that updates array ranges from text range
+    updateRanges(textRange: string, pageCount: number) {
+        if(!this.textRangeIsCorrect(textRange, pageCount)) return null;
+        
+        // remove all ranges when text is deleted
+        if (textRange.length === 0) return [];
+        
+        // remove all spaces
+        textRange = textRange.replace(" ", "");
+
         // separate the ranges
-        const ranges = this.textRange.split(",");
+        const ranges = textRange.split(",");
         // iterate over an range array
         const updatedRanges = [];
         for (let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
@@ -101,26 +112,29 @@ export default class PageRange {
             // if rangeNumbers has only one element, it's a single number
             if (rangeNumbers.length === 1) {
                 const number = parseInt(rangeNumbers[0]);
-                updatedRanges.push({ start: number, end: number });
+                updatedRanges.push([number, number]);
                 // ranges[rangeIndex] = { start: number, end: number };
             } else if (rangeNumbers.length !== 2) {
                 // return;
-                updatedRanges.push({ start: 0, end: 0 });
+                // updatedRanges.push({ start: 0, end: 0 });
+                updatedRanges.push([0, 0]);
                 // ranges[rangeIndex] = { start: 0, end: 0 };
             } else {
                 // check if the numbers are correct
                 const firstNumber = parseInt(rangeNumbers[0]);
                 const secondNumber = parseInt(rangeNumbers[1]);
                 if (firstNumber > secondNumber) {
-                    updatedRanges.push({ start: secondNumber, end: firstNumber });
+                    updatedRanges.push
+                    updatedRanges.push([secondNumber, firstNumber]);
+                    // updatedRanges.push({ start: secondNumber, end: firstNumber });
                     // ranges[rangeIndex] = { start: secondNumber, end: firstNumber };
                 } else {
-                    updatedRanges.push({ start: firstNumber, end: secondNumber });
+                    updatedRanges.push([firstNumber, secondNumber]);
+                    // updatedRanges.push({ start: firstNumber, end: secondNumber });
                     // ranges[rangeIndex] = { start: firstNumber, end: secondNumber };
                 }
             }
         }
-        console.log("updatedRanges", updatedRanges);
         return updatedRanges;
     };
 

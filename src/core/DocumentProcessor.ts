@@ -1,5 +1,6 @@
 import * as pdfjsLib from 'pdfjs-dist';
 import DocumentConvertor from './DocumentConvertor';
+import type { TextContent } from 'pdfjs-dist/types/src/display/api';
 
 
 export interface DocumentFilters {
@@ -91,22 +92,46 @@ export default class DocumentProcessor {
         }
     }
 
+    private async pageHasText(page: pdfjsLib.PDFPageProxy, lookingFor: string[]) {
+        const textContent: TextContent = await page.getTextContent();
+
+        let summary = "";
+        textContent.items.forEach(element => {
+            summary += " " + element.str.toUpperCase();
+        });
+
+        // find the text in the page
+        for (let textIndex = 0; textIndex < lookingFor.length; textIndex++) {
+            if (summary.includes(lookingFor[textIndex].toUpperCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private async calculatePageFilters(page: pdfjsLib.PDFPageProxy, filters: DocumentFilters): Promise<boolean> {
         const annotations = await page.getAnnotations();
         const pageIndex = page._pageIndex;
-        const highlight = filters.checks.hasHighlights && this.isHighlighted(annotations);
-        const links = filters.checks.hasLinks && this.hasLinks(annotations);
-        const images = filters.checks.hasImages && await this.hasImages(page);
 
-        let range = true;
-        range = filters.textRange ? this.isInRange(filters.textRange, pageIndex) : true;
+        // calculate the hightight filter
+        const highlight = filters.checks.hasHighlights ? this.isHighlighted(annotations) : true;
+        const links = filters.checks.hasLinks ? this.hasLinks(annotations) : true;
+        const images = filters.checks.hasImages ? await this.hasImages(page) : true;
+        const keywords = filters.keywords.words ? await this.pageHasText(page, filters.keywords.words) : true;
+        let range = filters.textRange ? this.isInRange(filters.textRange, pageIndex) : true;
 
         let result = (highlight || links || images);
 
         if (filters.checks.logicOperator === 'AND') {
             result &&= range;
-        } else if (filters.checks.logicOperator === 'OR') {
+        } else {
             result ||= range;
+        }
+
+        if (filters.keywords.logicOperator === 'AND') {
+            result &&= keywords;
+        } else {
+            result ||= keywords;
         }
 
         return result;
