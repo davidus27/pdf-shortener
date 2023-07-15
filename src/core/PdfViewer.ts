@@ -15,10 +15,6 @@ export default class PdfViewer {
         this.pdfDocuments = await DocumentConvertor.getDocumentProxies(this.files);
     }
 
-    public getOriginalPageCount() {
-        
-    }
-
     private renderPage(pdf: any, pageNumber: number, canvas: any) {
         pdf.getPage(pageNumber).then((page: any) => {
             const viewport = page.getViewport({ scale: this.scale });

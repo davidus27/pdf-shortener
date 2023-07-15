@@ -91,11 +91,11 @@ export default class PageRangeUtility {
 
     // function that updates array ranges from text range
     updateRanges(textRange: string, pageCount: number) {
-        if(!this.textRangeIsCorrect(textRange, pageCount)) return null;
-        
+        if (!this.textRangeIsCorrect(textRange, pageCount)) return null;
+
         // remove all ranges when text is deleted
         if (textRange.length === 0) return [];
-        
+
         // remove all spaces
         textRange = textRange.replace(" ", "");
 
@@ -113,25 +113,18 @@ export default class PageRangeUtility {
             if (rangeNumbers.length === 1) {
                 const number = parseInt(rangeNumbers[0]);
                 updatedRanges.push([number, number]);
-                // ranges[rangeIndex] = { start: number, end: number };
+
             } else if (rangeNumbers.length !== 2) {
-                // return;
-                // updatedRanges.push({ start: 0, end: 0 });
                 updatedRanges.push([0, 0]);
-                // ranges[rangeIndex] = { start: 0, end: 0 };
+
             } else {
                 // check if the numbers are correct
                 const firstNumber = parseInt(rangeNumbers[0]);
                 const secondNumber = parseInt(rangeNumbers[1]);
                 if (firstNumber > secondNumber) {
-                    updatedRanges.push
                     updatedRanges.push([secondNumber, firstNumber]);
-                    // updatedRanges.push({ start: secondNumber, end: firstNumber });
-                    // ranges[rangeIndex] = { start: secondNumber, end: firstNumber };
                 } else {
                     updatedRanges.push([firstNumber, secondNumber]);
-                    // updatedRanges.push({ start: firstNumber, end: secondNumber });
-                    // ranges[rangeIndex] = { start: firstNumber, end: secondNumber };
                 }
             }
         }

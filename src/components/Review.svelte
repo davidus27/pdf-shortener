@@ -26,7 +26,7 @@
     // this starts the process of filtering the files
     executor = new ExecuteProcesses($files, $formData);
     await executor.renderDocuments();
-    filteredPageCounts.set(await executor.getPageCount());
+    filteredPageCounts.set(executor.getFilteredPageCounts());
   });
 
   const handleDownload = async () => {
