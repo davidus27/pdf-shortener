@@ -31,9 +31,9 @@ export default class DocumentConvertor {
         });
     }
 
-    public static async getDocumentProxies(files: Array<File>) {
+    public static async getDocumentProxies(files: File[]) {
 
-        if (!files && !files.length)
+        if (!files || !files.length)
             return;
 
         const pdfTasks = [];

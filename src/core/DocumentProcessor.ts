@@ -65,7 +65,6 @@ export default class DocumentProcessor {
             for (let operatorIndex = 0; operatorIndex < operatorList.fnArray.length; operatorIndex++) {
                 const operator = operatorList.fnArray[operatorIndex];
                 if (validObjectTypes.includes(operator)) {
-                    // const imageName = operatorList.argsArray[operatorIndex][0];
                     return true;
                 }
             }
@@ -75,17 +74,19 @@ export default class DocumentProcessor {
         return false;
     }
 
-    private hasText(text: string) {
-    }
-
     private isInRange(textRange: string, pageIndex: number) {
+        pageIndex++; // pages start from 1
+
         const ranges = textRange.split(',');
         // iterate over ranges and check if they match the filter
         for (let rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
             const range = ranges[rangeIndex];
             const rangeParts = range.split('-');
             const start = parseInt(rangeParts[0]);
-            const end = parseInt(rangeParts[1]);
+
+            // check if the range is a single page or a range
+            const end = rangeParts.length === 1 ? start : parseInt(rangeParts[1]);
+
             if (start <= pageIndex && pageIndex <= end) {
                 return true;
             }
@@ -96,7 +97,7 @@ export default class DocumentProcessor {
         const textContent: TextContent = await page.getTextContent();
 
         let summary = "";
-        textContent.items.forEach(element => {
+        textContent.items.forEach((element: any) => {
             summary += " " + element.str.toUpperCase();
         });
 
@@ -138,7 +139,7 @@ export default class DocumentProcessor {
     }
 
 
-    public async getFilteredPages(filters: DocumentFilters): Promise<number[][]> {
+    public async calculateFilteredPages(filters: DocumentFilters): Promise<number[][]> {
         if (!this.documentProxies) {
             await this.prepare();
         }

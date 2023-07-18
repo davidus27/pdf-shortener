@@ -7,7 +7,8 @@
     "dev": "rollup -c -w",
     "start": "sirv public --no-clear",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "test": "cypress run",
+    "test:cypress": "cypress run",
+    "test": "mocha --require ts-node/register --recursive test/**/*.spec.ts",
     "test:gui": "cypress open"
   },
   "devDependencies": {
@@ -15,8 +16,10 @@
     "@rollup/plugin-node-resolve": "^11.0.0",
     "@rollup/plugin-typescript": "^8.0.0",
     "@tsconfig/svelte": "^2.0.0",
+    "@types/jest": "^29.5.3",
+    "@types/mocha": "^10.0.1",
     "attractions": "^3.7.0",
-    "cypress": "^10.6.0",
+    "cypress": "^4.2.0",
     "cypress-file-upload": "^5.0.8",
     "postcss": "^8.4.14",
     "rollup": "^2.3.4",
@@ -36,6 +39,9 @@
     "@rollup/plugin-json": "^4.1.0",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^2.14.305",
-    "sirv-cli": "^2.0.0"
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-web-worker-loader": "^1.6.1",
+    "sirv-cli": "^2.0.0",
+    "ts-node": "^10.9.1"
   }
 }

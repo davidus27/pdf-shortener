@@ -26,7 +26,7 @@
     // this starts the process of filtering the files
     executor = new ExecuteProcesses($files, $formData);
     await executor.renderDocuments();
-    filteredPageCounts.set(await executor.getPageCount());
+    filteredPageCounts.set(executor.getFilteredPageCounts());
   });
 
   const handleDownload = async () => {
@@ -46,7 +46,7 @@
   <Accordion let:closeOtherPanels>
     <AccordionSection on:panel-open={closeOtherPanels}>
       <div slot="handle" let:toggle>
-        <Button on:click={toggle}>
+        <Button class="preview-btn" on:click={toggle}>
           <H2>Preview pages</H2>&nbsp;
           <ChevronDownIcon size="25" class="ml accordion-chevron" />
         </Button>

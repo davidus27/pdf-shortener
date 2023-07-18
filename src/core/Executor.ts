@@ -22,20 +22,33 @@ export default class Executor {
     this.documentFilters = documentFilters;
   }
 
-  private async getFilteredPages(): Promise<number[][]> {
+  private async prepareFilteredPages(): Promise<number[][]> {
     const documentProcessor = new DocumentProcessor(this.files);
-    const filteredPages = await documentProcessor.getFilteredPages(this.documentFilters);
-    return documentProcessor.tranformFilteredPagesToIndexes(filteredPages);
+    this.filteredPages = await documentProcessor.calculateFilteredPages(this.documentFilters);
+    return documentProcessor.tranformFilteredPagesToIndexes(this.filteredPages);
+  }
+
+  public getFilteredPageCounts(): Array<number> {
+    const filteredPageCounts = [];
+    for (let fileIndex = 0; fileIndex < this.files.length; fileIndex++) {
+      const pageCount = this.filteredPages[fileIndex].reduce((a, b) => {
+        // a = a ? 1: 0;
+        // b = b ? 1: 0;
+        return +a + +b; 
+      }, 0);
+      filteredPageCounts.push(pageCount);
+    }
+    return filteredPageCounts;
   }
 
   public async renderDocuments(): Promise<void> {
-    const filteredPages = await this.getFilteredPages();
+    const filteredPages = await this.prepareFilteredPages();
     const pdfViewerObj = new PdfViewer(this.files);
     await pdfViewerObj.renderAllDocuments(filteredPages);
   }
 
   public async downloadAllDocuments(): Promise<void> {
-    const filteredPages = await this.getFilteredPages();
+    const filteredPages = await this.prepareFilteredPages();
     // iterate over files and download each one
     for (let fileIndex = 0; fileIndex < this.files.length; fileIndex++) {
       const dc = new DocumentCutter(this.files[fileIndex]);

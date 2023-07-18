@@ -22,7 +22,8 @@
         <Accordion let:closeOtherPanels>
             <AccordionSection on:panel-open={closeOtherPanels}>
                 <div slot="handle" let:toggle>
-                    <Button on:click={toggle}>
+                    <Button class="summary-btn"
+                    on:click={toggle}>
                         <H2>Summary</H2>&nbsp;
                         <ChevronDownIcon
                             size="25"
