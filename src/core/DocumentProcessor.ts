@@ -97,7 +97,7 @@ export default class DocumentProcessor {
         const textContent: TextContent = await page.getTextContent();
 
         let summary = "";
-        textContent.items.forEach(element => {
+        textContent.items.forEach((element: any) => {
             summary += " " + element.str.toUpperCase();
         });
 
