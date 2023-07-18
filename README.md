@@ -94,7 +94,9 @@ and also the option to start up the Cypress application and run the tests manual
 npm run test:gui
 ```
 
+<!-- 
+TODO: add UML diagram
 #### UML Diagram
 The `core` library stored [here](./src/core/) is split into separate classes that are used to perform the operations on the PDF documents. The UML diagram of the library is shown below.
 
-![UML Diagram](./docs/imgs/uml.png)
+![UML Diagram](./docs/imgs/uml.png) -->
